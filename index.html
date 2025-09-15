@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Career Counselor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: {
+                DEFAULT: '#0D47A1', // Dark Blue
+                light: '#1976D2',  // Medium Blue
+                dark: '#002171',   // Very Dark Blue
+              },
+              secondary: {
+                DEFAULT: '#00ACC1', // Cyan
+                light: '#4DD0E1',
+                dark: '#007C91',
+              },
+              accent: {
+                DEFAULT: '#FFAB00', // Amber
+              },
+              neutral: {
+                light: '#F5F5F5', // Light Gray
+                DEFAULT: '#E0E0E0', // Gray
+                dark: '#424242',   // Dark Gray
+              },
+              background: '#F0F4F8', // Light bluish gray
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+          },
+        },
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+     <script>
+      // Make sure to replace "YOUR_ACTUAL_GEMINI_API_KEY" with your real API key.
+      // This is ONLY for local development and should NOT be committed to version control if it contains your actual key.
+      window.process = {
+        env: {
+          API_KEY: "AIzaSyBpPqF-iWRREqoQAnx1QRLzg210JanCB7s" 
+        }
+      };
+    </script>
+    <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.3.0",
+    "pdfjs-dist": "https://esm.sh/pdfjs-dist@4.4.168/build/pdf.min.js",
+    "pdfjs-dist/build/pdf.worker.js": "https://esm.sh/pdfjs-dist@4.4.168/build/pdf.worker.min.js",
+    "pdfjs-dist/": "https://esm.sh/pdfjs-dist@4.4.168/"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-background font-sans">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
