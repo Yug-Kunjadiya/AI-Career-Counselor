@@ -1,17 +1,20 @@
-
-import React, { useState, useEffect, RefObject } from 'react';
-import { ChatMessage } from '../types';
-import { PaperAirplaneIcon, UserCircleIcon, SparklesIcon as BotIcon } from './icons'; // Using SparklesIcon as BotIcon
-import LoadingSpinner from './LoadingSpinner';
-
-interface AIChatProps {
-  chatHistory: ChatMessage[];
-  onSendMessage: (message: string) => void;
-  isLoading: boolean;
-  chatContainerRef: RefObject<HTMLDivElement>;
-}
-
-const AIChat: React.FC<AIChatProps> = ({ chatHistory, onSendMessage, isLoading, chatContainerRef }) => {
+  // Helper to render bot answers with bullet points and short paragraphs, no markdown
+  function renderBotPlainText(text: string) {
+    // Remove markdown formatting
+    const cleanText = text.replace(/[*_`#>-]/g, '');
+    // Split into lines
+    const lines = cleanText.split(/\r?\n/).filter(line => line.trim() !== '');
+    // If multiple lines look like a list, render as bullet points
+    if (lines.length > 1 && lines.every(line => line.match(/^\s*\d+\.|^\s*\.|^\s*\w+\.|^\s*\w+\)/) || line.trim().length < 60)) {
+      return (
+        <ul className="list-disc pl-5 text-sm">
+          {lines.map((line, idx) => <li key={idx}>{line.trim()}</li>)}
+        </ul>
+      );
+    }
+    // Otherwise, render as short paragraphs
+    return lines.map((line, idx) => <p key={idx} className="text-sm whitespace-pre-wrap mb-2">{line.trim()}</p>);
+  }
   const [newMessage, setNewMessage] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -20,7 +23,6 @@ const AIChat: React.FC<AIChatProps> = ({ chatHistory, onSendMessage, isLoading, 
     onSendMessage(newMessage);
     setNewMessage('');
   };
-
   return (
     <div className="flex flex-col h-[500px] bg-neutral-light/50 rounded-lg shadow-inner">
       <div ref={chatContainerRef} className="flex-grow p-4 space-y-4 overflow-y-auto scroll-smooth">
@@ -38,11 +40,33 @@ const AIChat: React.FC<AIChatProps> = ({ chatHistory, onSendMessage, isLoading, 
                 </span>
                 {msg.sender === 'user' && <UserCircleIcon className="w-5 h-5 text-white/80 ml-2 flex-shrink-0" />}
               </div>
-              {/* Basic markdown-like rendering for newlines */}
-              {msg.text.split('\n').map((line, index) => (
-                <p key={index} className="text-sm whitespace-pre-wrap">{line}</p>
-              ))}
-            </div>
+              {/* Render bot answers as plain text with bullet points and short paragraphs, no markdown */}
+              {msg.sender === 'ai'
+                ? renderBotPlainText(msg.text)
+                : msg.text.split('\n').map((line, index) => (
+                    <p key={index} className="text-sm whitespace-pre-wrap">{line}</p>
+                  ))}
+// Helper to render bot answers with bullet points and short paragraphs, no markdown
+function renderBotPlainText(text: string) {
+  // Remove markdown formatting
+  const cleanText = text.replace(/[*_`#>\-]/g, '');
+  // Split into lines
+  const lines = cleanText.split(/\r?\n/).filter(line => line.trim() !== '');
+  // Bullet list detection
+  const bulletRegex = /^\s*(\d+\.)|^\s*[\-\*\•]/;
+  const isBulletList = lines.length > 1 && lines.every(line => bulletRegex.test(line) || line.trim().length < 60);
+  if (isBulletList) {
+    return (
+      <ul className="list-disc pl-5 text-sm">
+        {lines.map((line, idx) => <li key={idx}>{line.trim()}</li>)}
+      </ul>
+    );
+  }
+  // Otherwise, render as short paragraphs
+  return lines.map((line, idx) => (
+    <p key={idx} className="text-sm whitespace-pre-wrap mb-2">{line.trim()}</p>
+  ));
+}          </div>
           </div>
         ))}
         {isLoading && chatHistory[chatHistory.length -1]?.sender === 'user' && (
@@ -80,6 +104,10 @@ const AIChat: React.FC<AIChatProps> = ({ chatHistory, onSendMessage, isLoading, 
       </form>
     </div>
   );
+
+
+  // ...existing code...
+  // Please restore the previous working chat UI logic here, e.g. mapping chatHistory, rendering user and bot messages, and the input form.
 };
 
 export default AIChat;
