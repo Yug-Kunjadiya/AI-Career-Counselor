@@ -1,11 +1,31 @@
+import React, { useState, useRef, ReactFormEvent } from 'react';
+import { BotIcon, UserCircleIcon, LoadingSpinner, PaperAirplaneIcon } from './icons'; // Adjust import paths as needed
+
+interface Message {
+  id: string;
+  sender: 'user' | 'ai';
+  text: string;
+  timestamp: number;
+}
+
+interface AIChatProps {
+  chatHistory: Message[];
+  isLoading: boolean;
+  onSendMessage: (message: string) => void;
+  chatContainerRef: React.RefObject<HTMLDivElement>;
+}
+
+const AIChat: React.FC<AIChatProps> = ({ chatHistory, isLoading, onSendMessage, chatContainerRef }) => {
   // Helper to render bot answers with bullet points and short paragraphs, no markdown
   function renderBotPlainText(text: string) {
     // Remove markdown formatting
-    const cleanText = text.replace(/[*_`#>-]/g, '');
+    const cleanText = text.replace(/[*_`#>\-]/g, '');
     // Split into lines
     const lines = cleanText.split(/\r?\n/).filter(line => line.trim() !== '');
-    // If multiple lines look like a list, render as bullet points
-    if (lines.length > 1 && lines.every(line => line.match(/^\s*\d+\.|^\s*\.|^\s*\w+\.|^\s*\w+\)/) || line.trim().length < 60)) {
+    // Bullet list detection
+    const bulletRegex = /^\s*(\d+\.)|^\s*[\-\*\•]/;
+    const isBulletList = lines.length > 1 && lines.every(line => bulletRegex.test(line) || line.trim().length < 60);
+    if (isBulletList) {
       return (
         <ul className="list-disc pl-5 text-sm">
           {lines.map((line, idx) => <li key={idx}>{line.trim()}</li>)}
@@ -13,8 +33,11 @@
       );
     }
     // Otherwise, render as short paragraphs
-    return lines.map((line, idx) => <p key={idx} className="text-sm whitespace-pre-wrap mb-2">{line.trim()}</p>);
+    return lines.map((line, idx) => (
+      <p key={idx} className="text-sm whitespace-pre-wrap mb-2">{line.trim()}</p>
+    ));
   }
+
   const [newMessage, setNewMessage] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,6 +46,7 @@
     onSendMessage(newMessage);
     setNewMessage('');
   };
+
   return (
     <div className="flex flex-col h-[500px] bg-neutral-light/50 rounded-lg shadow-inner">
       <div ref={chatContainerRef} className="flex-grow p-4 space-y-4 overflow-y-auto scroll-smooth">
@@ -46,27 +70,7 @@
                 : msg.text.split('\n').map((line, index) => (
                     <p key={index} className="text-sm whitespace-pre-wrap">{line}</p>
                   ))}
-// Helper to render bot answers with bullet points and short paragraphs, no markdown
-function renderBotPlainText(text: string) {
-  // Remove markdown formatting
-  const cleanText = text.replace(/[*_`#>\-]/g, '');
-  // Split into lines
-  const lines = cleanText.split(/\r?\n/).filter(line => line.trim() !== '');
-  // Bullet list detection
-  const bulletRegex = /^\s*(\d+\.)|^\s*[\-\*\•]/;
-  const isBulletList = lines.length > 1 && lines.every(line => bulletRegex.test(line) || line.trim().length < 60);
-  if (isBulletList) {
-    return (
-      <ul className="list-disc pl-5 text-sm">
-        {lines.map((line, idx) => <li key={idx}>{line.trim()}</li>)}
-      </ul>
-    );
-  }
-  // Otherwise, render as short paragraphs
-  return lines.map((line, idx) => (
-    <p key={idx} className="text-sm whitespace-pre-wrap mb-2">{line.trim()}</p>
-  ));
-}          </div>
+            </div>
           </div>
         ))}
         {isLoading && chatHistory[chatHistory.length -1]?.sender === 'user' && (
@@ -104,10 +108,6 @@ function renderBotPlainText(text: string) {
       </form>
     </div>
   );
-
-
-  // ...existing code...
-  // Please restore the previous working chat UI logic here, e.g. mapping chatHistory, rendering user and bot messages, and the input form.
 };
 
 export default AIChat;
