@@ -1,17 +1,43 @@
+import React, { useState, useRef, ReactFormEvent } from 'react';
+import { BotIcon, UserCircleIcon, LoadingSpinner, PaperAirplaneIcon } from './icons'; // Adjust import paths as needed
 
-import React, { useState, useEffect, RefObject } from 'react';
-import { ChatMessage } from '../types';
-import { PaperAirplaneIcon, UserCircleIcon, SparklesIcon as BotIcon } from './icons'; // Using SparklesIcon as BotIcon
-import LoadingSpinner from './LoadingSpinner';
-
-interface AIChatProps {
-  chatHistory: ChatMessage[];
-  onSendMessage: (message: string) => void;
-  isLoading: boolean;
-  chatContainerRef: RefObject<HTMLDivElement>;
+interface Message {
+  id: string;
+  sender: 'user' | 'ai';
+  text: string;
+  timestamp: number;
 }
 
-const AIChat: React.FC<AIChatProps> = ({ chatHistory, onSendMessage, isLoading, chatContainerRef }) => {
+interface AIChatProps {
+  chatHistory: Message[];
+  isLoading: boolean;
+  onSendMessage: (message: string) => void;
+  chatContainerRef: React.RefObject<HTMLDivElement>;
+}
+
+const AIChat: React.FC<AIChatProps> = ({ chatHistory, isLoading, onSendMessage, chatContainerRef }) => {
+  // Helper to render bot answers with bullet points and short paragraphs, no markdown
+  function renderBotPlainText(text: string) {
+    // Remove markdown formatting
+    const cleanText = text.replace(/[*_`#>\-]/g, '');
+    // Split into lines
+    const lines = cleanText.split(/\r?\n/).filter(line => line.trim() !== '');
+    // Bullet list detection
+    const bulletRegex = /^\s*(\d+\.)|^\s*[\-\*\•]/;
+    const isBulletList = lines.length > 1 && lines.every(line => bulletRegex.test(line) || line.trim().length < 60);
+    if (isBulletList) {
+      return (
+        <ul className="list-disc pl-5 text-sm">
+          {lines.map((line, idx) => <li key={idx}>{line.trim()}</li>)}
+        </ul>
+      );
+    }
+    // Otherwise, render as short paragraphs
+    return lines.map((line, idx) => (
+      <p key={idx} className="text-sm whitespace-pre-wrap mb-2">{line.trim()}</p>
+    ));
+  }
+
   const [newMessage, setNewMessage] = useState<string>('');
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -38,10 +64,12 @@ const AIChat: React.FC<AIChatProps> = ({ chatHistory, onSendMessage, isLoading, 
                 </span>
                 {msg.sender === 'user' && <UserCircleIcon className="w-5 h-5 text-white/80 ml-2 flex-shrink-0" />}
               </div>
-              {/* Basic markdown-like rendering for newlines */}
-              {msg.text.split('\n').map((line, index) => (
-                <p key={index} className="text-sm whitespace-pre-wrap">{line}</p>
-              ))}
+              {/* Render bot answers as plain text with bullet points and short paragraphs, no markdown */}
+              {msg.sender === 'ai'
+                ? renderBotPlainText(msg.text)
+                : msg.text.split('\n').map((line, index) => (
+                    <p key={index} className="text-sm whitespace-pre-wrap">{line}</p>
+                  ))}
             </div>
           </div>
         ))}
