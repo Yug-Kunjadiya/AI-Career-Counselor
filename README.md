@@ -26,6 +26,22 @@ The core of this project is AI-driven resume analysis and career guidance.
 - Vite – for fast development and build
 - Google Gemini AI – for resume analysis and suggestions
 
+## Demo
+#### Resume Analysis
+<img width="1915" height="868" alt="image" src="https://github.com/user-attachments/assets/d8ef0c45-5c24-4b73-9017-caaa0eba8110" />
+
+#### career Roadmap
+<img width="1915" height="868" alt="image" src="https://github.com/user-attachments/assets/dae8bf2d-78de-4e9a-a0b2-215684bd8435" />
+
+#### skill Gap
+<img width="1848" height="856" alt="image" src="https://github.com/user-attachments/assets/7fb435a1-1389-409f-97fb-c355740c5021" />
+
+#### ChatBox
+<img width="1907" height="856" alt="image" src="https://github.com/user-attachments/assets/e9a0ac84-40d0-45bf-9ce8-8aac8ac8133c" />
+
+
+ 
+
 ## 📦 Installation
 
 Clone the repository:
@@ -49,6 +65,7 @@ Run the app:
 ```bash
 npm run dev
 ```
+
 
 ## 🖥️ How It Works
 
