@@ -1,12 +1,11 @@
-
 import { GoogleGenAI, Chat, GenerateContentResponse, HarmCategory, HarmBlockThreshold } from "@google/genai";
-import { ResumeData, CareerSuggestion } from '../types';
+import { ResumeData, CareerSuggestion, ATSScoreResult, ResumeImprovementTip, CareerRoadmap, InterviewQuestion, InterviewFeedback } from '../types';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
 let ai: GoogleGenAI | null = null;
 if (GEMINI_API_KEY) {
-  ai = new GoogleGenAI({ apiKey:'AIzaSyBpPqF-iWRREqoQAnx1QRLzg210JanCB7s' });
+  ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 } else {
   console.error("API_KEY for Gemini is not set. AI features will be severely limited or non-functional.");
 }
@@ -91,8 +90,8 @@ export const extractResumeDetails = async (resumeText: string): Promise<ResumeDa
     const parsed = parseGeminiJsonResponse<ResumeData>(response.text);
     if (!parsed) throw new Error("AI returned malformed data for resume details.");
     // Basic validation
-    if (typeof parsed.profileSummary !== 'string' || 
-        !Array.isArray(parsed.skills) || 
+    if (typeof parsed.profileSummary !== 'string' ||
+        !Array.isArray(parsed.skills) ||
         !parsed.skills.every(s => typeof s === 'string') ||
         typeof parsed.experienceSummary !== 'string' ||
         typeof parsed.educationLevel !== 'string') {
@@ -108,7 +107,7 @@ export const extractResumeDetails = async (resumeText: string): Promise<ResumeDa
 
 export const suggestCareers = async (resumeData: ResumeData): Promise<CareerSuggestion[] | null> => {
   if (!ai) throw new Error("Gemini AI client not initialized. API Key might be missing.");
-  
+
   const prompt = `
     Based on the following candidate profile, suggest 3-4 diverse and suitable career paths.
     For each career path, provide:
@@ -150,7 +149,7 @@ export const suggestCareers = async (resumeData: ResumeData): Promise<CareerSugg
     const parsed = parseGeminiJsonResponse<CareerSuggestion[]>(response.text);
      if (!parsed) throw new Error("AI returned malformed data for career suggestions.");
      // Basic validation for career suggestions
-     if (!Array.isArray(parsed) || !parsed.every(suggestion => 
+     if (!Array.isArray(parsed) || !parsed.every(suggestion =>
          typeof suggestion.careerName === 'string' &&
          typeof suggestion.reason === 'string' &&
          Array.isArray(suggestion.skillsToDevelop) && suggestion.skillsToDevelop.every(s => typeof s === 'string') &&
@@ -188,19 +187,19 @@ export const initializeChat = async (userName?: string): Promise<void> => {
   if (userName) {
     systemInstructionParts.push(`The user's name is ${userName}. Address them by it occasionally if natural.`);
   }
-  
+
   const systemInstruction = systemInstructionParts.join('\n');
 
   try {
     chatInstance = ai.chats.create({
       model: TEXT_MODEL_NAME,
-      config: { 
+      config: {
         systemInstruction,
         temperature: 0.75, // Slightly more creative for chat
         topP: 0.95,
         topK: 40,
       },
-      safetySettings,
+      // safetySettings, // Commented out as it may not be supported in current SDK version
       // History will be managed by the chatInstance internally
     });
     console.log("AI Chat initialized.");
@@ -216,7 +215,7 @@ export const sendMessageToAIChatUpdated = async (message: string): Promise<strin
     console.error("sendMessageToAIChatUpdated: API Key missing or AI client not initialized.");
     return "I'm sorry, but I'm unable to connect to my knowledge base right now due to a configuration issue (API Key missing). Please try again later or inform the site administrator.";
   }
-  
+
   if (!chatInstance) {
     await initializeChat(); // Attempt to initialize if not already
     if (!chatInstance) { // Check again
@@ -228,7 +227,7 @@ export const sendMessageToAIChatUpdated = async (message: string): Promise<strin
   try {
     // The chatInstance internally manages history.
     const response: GenerateContentResponse = await chatInstance.sendMessage({ message });
-    return response.text;
+    return response.text || null;
   } catch (error) {
     console.error("Error sending message to AI chat:", error);
     // Check for specific error types if possible, e.g., API key errors.
@@ -239,5 +238,327 @@ export const sendMessageToAIChatUpdated = async (message: string): Promise<strin
          return `Sorry, I encountered an error: ${error.message}. Please try again.`;
     }
     return "Sorry, I encountered an unexpected error. Please try again.";
+  }
+};
+
+// New AI functions for additional features
+
+export const analyzeATSScore = async (resumeText: string, targetJob?: string): Promise<ATSScoreResult | null> => {
+  if (!ai) throw new Error("Gemini AI client not initialized. API Key might be missing.");
+
+  const prompt = `
+    Analyze the following resume text for Applicant Tracking System (ATS) compatibility.
+    ${targetJob ? `Target job/role: ${targetJob}` : 'General ATS analysis'}
+
+    Return ONLY a valid JSON object with the exact following structure:
+    {
+      "score": 85,
+      "grade": "B",
+      "strengths": ["Clear contact information", "Quantified achievements"],
+      "weaknesses": ["Missing keywords", "Generic descriptions"],
+      "improvementSuggestions": ["Add industry-specific keywords", "Use standard section headings"],
+      "keywordMatches": 12,
+      "totalKeywords": 15
+    }
+
+    Resume Text:
+    ---
+    ${resumeText}
+    ---
+
+    Scoring criteria:
+    - Score: 0-100 based on ATS compatibility
+    - Grade: A (90-100), B (80-89), C (70-79), D (60-69), F (0-59)
+    - Strengths: 3-5 specific strengths
+    - Weaknesses: 3-5 specific weaknesses
+    - Improvement suggestions: 4-6 actionable suggestions
+    - Keyword matches: Number of relevant keywords found
+    - Total keywords: Total relevant keywords expected for the field
+
+    Ensure the entire output is a single, valid JSON object. Do not add any text or explanations before or after the JSON object.
+  `;
+
+  try {
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: TEXT_MODEL_NAME,
+      contents: [{ role: "user", parts: [{text: prompt}] }],
+      config: { ...generationConfig, responseMimeType: "application/json" },
+    });
+    const parsed = parseGeminiJsonResponse<ATSScoreResult>(response.text);
+    if (!parsed) throw new Error("AI returned malformed data for ATS score.");
+    // Basic validation
+    if (typeof parsed.score !== 'number' ||
+        typeof parsed.grade !== 'string' ||
+        !Array.isArray(parsed.strengths) ||
+        !Array.isArray(parsed.weaknesses) ||
+        !Array.isArray(parsed.improvementSuggestions) ||
+        typeof parsed.keywordMatches !== 'number' ||
+        typeof parsed.totalKeywords !== 'number') {
+        console.error("Parsed ATS score data has incorrect types:", parsed);
+        throw new Error("AI returned data with incorrect structure for ATS score.");
+    }
+    return parsed;
+  } catch (error) {
+    console.error("Error analyzing ATS score from Gemini:", error);
+    throw error;
+  }
+};
+
+export const getResumeImprovementTips = async (resumeText: string): Promise<ResumeImprovementTip[] | null> => {
+  if (!ai) throw new Error("Gemini AI client not initialized. API Key might be missing.");
+
+  const prompt = `
+    Analyze the following resume text and provide specific improvement tips.
+    Focus on common resume issues and provide actionable suggestions.
+
+    Return ONLY a valid JSON array of objects with the exact following structure:
+    [
+      {
+        "section": "Summary",
+        "issue": "Too generic and lacks specific achievements",
+        "severity": "high",
+        "suggestion": "Replace generic statements with specific accomplishments and metrics",
+        "rewrittenExample": "Results-driven software engineer with 5+ years of experience developing scalable web applications, increasing user engagement by 40% through optimized performance."
+      }
+    ]
+
+    Resume Text:
+    ---
+    ${resumeText}
+    ---
+
+    For each tip:
+    - section: The resume section (Summary, Experience, Skills, Education, etc.)
+    - issue: Specific problem identified
+    - severity: "low", "medium", or "high"
+    - suggestion: Actionable advice
+    - rewrittenExample: Optional rewritten version of the problematic section
+
+    Provide 5-8 improvement tips covering different sections.
+    Ensure the output is only the JSON array. Do not add any text before or after the JSON.
+  `;
+
+  try {
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: TEXT_MODEL_NAME,
+      contents: [{ role: "user", parts: [{text: prompt}] }],
+      config: { ...generationConfig, responseMimeType: "application/json" },
+    });
+    const parsed = parseGeminiJsonResponse<ResumeImprovementTip[]>(response.text);
+    if (!parsed) throw new Error("AI returned malformed data for resume improvement tips.");
+    // Basic validation
+    if (!Array.isArray(parsed) || !parsed.every(tip =>
+        typeof tip.section === 'string' &&
+        typeof tip.issue === 'string' &&
+        ['low', 'medium', 'high'].includes(tip.severity) &&
+        typeof tip.suggestion === 'string' &&
+        (tip.rewrittenExample === undefined || typeof tip.rewrittenExample === 'string')
+    )) {
+        console.error("Parsed resume improvement tips have incorrect types:", parsed);
+        throw new Error("AI returned data with incorrect structure for resume improvement tips.");
+    }
+    return parsed;
+  } catch (error) {
+    console.error("Error getting resume improvement tips from Gemini:", error);
+    throw error;
+  }
+};
+
+export const generateCareerRoadmap = async (resumeData: ResumeData, targetCareer: string): Promise<CareerRoadmap | null> => {
+  if (!ai) throw new Error("Gemini AI client not initialized. API Key might be missing.");
+
+  const prompt = `
+    Create a detailed career roadmap for transitioning to or advancing in: ${targetCareer}
+
+    Based on the candidate's profile, generate a comprehensive roadmap with milestones.
+
+    Return ONLY a valid JSON object with the exact following structure:
+    {
+      "careerPath": "Software Engineering",
+      "sixMonthRoadmap": [
+        {
+          "id": "skill-building-1",
+          "title": "Master JavaScript Fundamentals",
+          "description": "Deepen understanding of ES6+, async programming, and modern frameworks",
+          "duration": "8 weeks",
+          "skills": ["JavaScript", "ES6+", "Async/Await"],
+          "resources": ["MDN Web Docs", "JavaScript.info", "freeCodeCamp"],
+          "completed": false,
+          "priority": "high"
+        }
+      ],
+      "oneYearRoadmap": [
+        {
+          "id": "project-1",
+          "title": "Build Portfolio Projects",
+          "description": "Create 3-5 substantial projects demonstrating key skills",
+          "duration": "6 months",
+          "skills": ["React", "Node.js", "Database Design"],
+          "resources": ["GitHub", "Personal website", "Open source contributions"],
+          "completed": false,
+          "priority": "high"
+        }
+      ],
+      "skillGaps": ["System Design", "Cloud Architecture", "Leadership"],
+      "estimatedTimeToJob": "6-9 months"
+    }
+
+    Candidate Profile:
+    ---
+    Profile Summary: ${resumeData.profileSummary}
+    Skills: ${resumeData.skills.join(', ')}
+    Experience Summary: ${resumeData.experienceSummary}
+    Education Level: ${resumeData.educationLevel}
+    ---
+
+    Guidelines:
+    - sixMonthRoadmap: 4-6 milestones for the first 6 months
+    - oneYearRoadmap: 6-8 milestones for the full year
+    - Each milestone should have unique id, realistic duration, relevant skills and resources
+    - skillGaps: 3-5 key skills the candidate needs to develop
+    - estimatedTimeToJob: Realistic timeline based on their background
+
+    Ensure the entire output is a single, valid JSON object. Do not add any text or explanations before or after the JSON object.
+  `;
+
+  try {
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: TEXT_MODEL_NAME,
+      contents: [{ role: "user", parts: [{text: prompt}] }],
+      config: { ...generationConfig, responseMimeType: "application/json" },
+    });
+    const parsed = parseGeminiJsonResponse<CareerRoadmap>(response.text);
+    if (!parsed) throw new Error("AI returned malformed data for career roadmap.");
+    // Basic validation
+    if (typeof parsed.careerPath !== 'string' ||
+        !Array.isArray(parsed.sixMonthRoadmap) ||
+        !Array.isArray(parsed.oneYearRoadmap) ||
+        !Array.isArray(parsed.skillGaps) ||
+        typeof parsed.estimatedTimeToJob !== 'string') {
+        console.error("Parsed career roadmap has incorrect types:", parsed);
+        throw new Error("AI returned data with incorrect structure for career roadmap.");
+    }
+    return parsed;
+  } catch (error) {
+    console.error("Error generating career roadmap from Gemini:", error);
+    throw error;
+  }
+};
+
+export const generateInterviewQuestions = async (resumeData: ResumeData, targetCareer: string): Promise<InterviewQuestion[] | null> => {
+  if (!ai) throw new Error("Gemini AI client not initialized. API Key might be missing.");
+
+  const prompt = `
+    Generate personalized interview questions for: ${targetCareer}
+
+    Based on the candidate's resume, create relevant interview questions they might encounter.
+
+    Return ONLY a valid JSON array of objects with the exact following structure:
+    [
+      {
+        "id": "tech-1",
+        "question": "Can you explain the difference between var, let, and const in JavaScript?",
+        "category": "Technical",
+        "difficulty": "easy",
+        "expectedAnswer": "var is function-scoped, let and const are block-scoped. const cannot be reassigned."
+      }
+    ]
+
+    Candidate Profile:
+    ---
+    Profile Summary: ${resumeData.profileSummary}
+    Skills: ${resumeData.skills.join(', ')}
+    Experience Summary: ${resumeData.experienceSummary}
+    Education Level: ${resumeData.educationLevel}
+    ---
+
+    Guidelines:
+    - Generate 10-15 questions total
+    - Mix of categories: Technical, Behavioral, Situational
+    - Difficulty levels: easy, medium, hard
+    - Questions should be relevant to their experience and target career
+    - Include expectedAnswer for some questions (optional)
+
+    Ensure the output is only the JSON array. Do not add any text before or after the JSON.
+  `;
+
+  try {
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: TEXT_MODEL_NAME,
+      contents: [{ role: "user", parts: [{text: prompt}] }],
+      config: { ...generationConfig, responseMimeType: "application/json" },
+    });
+    const parsed = parseGeminiJsonResponse<InterviewQuestion[]>(response.text);
+    if (!parsed) throw new Error("AI returned malformed data for interview questions.");
+    // Basic validation
+    if (!Array.isArray(parsed) || !parsed.every(question =>
+        typeof question.id === 'string' &&
+        typeof question.question === 'string' &&
+        typeof question.category === 'string' &&
+        ['easy', 'medium', 'hard'].includes(question.difficulty) &&
+        (question.expectedAnswer === undefined || typeof question.expectedAnswer === 'string')
+    )) {
+        console.error("Parsed interview questions have incorrect types:", parsed);
+        throw new Error("AI returned data with incorrect structure for interview questions.");
+    }
+    return parsed;
+  } catch (error) {
+    console.error("Error generating interview questions from Gemini:", error);
+    throw error;
+  }
+};
+
+export const analyzeInterviewAnswer = async (question: string, answer: string, category: string): Promise<InterviewFeedback | null> => {
+  if (!ai) throw new Error("Gemini AI client not initialized. API Key might be missing.");
+
+  const prompt = `
+    Analyze the following interview answer and provide detailed feedback.
+
+    Question: ${question}
+    Category: ${category}
+    Answer: ${answer}
+
+    Return ONLY a valid JSON object with the exact following structure:
+    {
+      "questionId": "tech-1",
+      "score": 8,
+      "strengths": ["Clear explanation", "Used specific examples"],
+      "weaknesses": ["Could be more concise", "Missed key technical detail"],
+      "suggestions": ["Practice explaining concepts more succinctly", "Include code examples when relevant"],
+      "overallFeedback": "Good answer overall. Shows solid understanding but could benefit from more structure."
+    }
+
+    Scoring criteria:
+    - score: 1-10 (10 being excellent)
+    - strengths: 2-4 specific positive aspects
+    - weaknesses: 1-3 areas for improvement
+    - suggestions: 2-4 actionable improvement tips
+    - overallFeedback: 2-3 sentence summary
+
+    Ensure the entire output is a single, valid JSON object. Do not add any text or explanations before or after the JSON object.
+  `;
+
+  try {
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: TEXT_MODEL_NAME,
+      contents: [{ role: "user", parts: [{text: prompt}] }],
+      config: { ...generationConfig, responseMimeType: "application/json" },
+    });
+    const parsed = parseGeminiJsonResponse<InterviewFeedback>(response.text);
+    if (!parsed) throw new Error("AI returned malformed data for interview feedback.");
+    // Basic validation
+    if (typeof parsed.questionId !== 'string' ||
+        typeof parsed.score !== 'number' ||
+        !Array.isArray(parsed.strengths) ||
+        !Array.isArray(parsed.weaknesses) ||
+        !Array.isArray(parsed.suggestions) ||
+        typeof parsed.overallFeedback !== 'string') {
+        console.error("Parsed interview feedback has incorrect types:", parsed);
+        throw new Error("AI returned data with incorrect structure for interview feedback.");
+    }
+    return parsed;
+  } catch (error) {
+    console.error("Error analyzing interview answer from Gemini:", error);
+    throw error;
   }
 };

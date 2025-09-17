@@ -10,6 +10,7 @@ import ResumeImprovementTips from './components/ResumeImprovementTips';
 import InterviewPreparation from './components/InterviewPreparation';
 import { extractResumeDetails, suggestCareers, initializeChat, sendMessageToAIChatUpdated } from './services/geminiService';
 import { BriefcaseIcon, ChatBubbleLeftRightIcon, DocumentTextIcon, LightBulbIcon, WarningTriangleIcon } from './components/icons';
+import useScrollBlur from './hooks/useScrollBlur';
 
 const App: React.FC = () => {
   const [apiKeyMissing, setApiKeyMissing] = useState<boolean>(false);
@@ -26,7 +27,9 @@ const App: React.FC = () => {
   const [errorResume, setErrorResume] = useState<string | null>(null);
   const [errorSuggestions, setErrorSuggestions] = useState<string | null>(null);
 
-const chatContainerRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
+
+  const blurAmount = useScrollBlur(10, 300);
 
   useEffect(() => {
     if (!process.env.API_KEY) {
@@ -56,13 +59,12 @@ const chatContainerRef = useRef<HTMLDivElement>(null);
     setIsLoadingResume(true);
     setErrorResume(null);
     setParsedResumeData(null);
-    setCareerSuggestions([]); // Clear previous suggestions
+    setCareerSuggestions([]);
 
     try {
       const data = await extractResumeDetails(resumeText);
       if (data) {
         setParsedResumeData(data);
-        // Automatically fetch suggestions after parsing
         await handleGetCareerSuggestions(data);
       } else {
         setErrorResume("Could not extract details from resume. The AI might have had trouble understanding the format or content.");
@@ -167,7 +169,6 @@ My Question: ${messageText}`;
       case 'resume-analysis':
         return (
           <div className="space-y-8">
-            {/* Resume Input Section */}
             <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
               <div className="flex items-center mb-4">
                 <DocumentTextIcon className="h-8 w-8 text-primary mr-3" />
@@ -192,7 +193,6 @@ My Question: ${messageText}`;
               )}
             </section>
 
-            {/* Career Suggestions Section - Conditionally render after resume analysis */}
             {(parsedResumeData || isLoadingSuggestions || errorSuggestions) && (
             <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
               <div className="flex items-center mb-4">
@@ -247,11 +247,11 @@ My Question: ${messageText}`;
       <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
 
       <div className="flex-1 flex flex-col">
-        <header className="w-full p-6 text-center bg-white/10 backdrop-blur-sm">
+        <header id="app-header" className="w-full p-6 text-center bg-gradient-to-r from-primary-dark/80 to-secondary-dark/80 backdrop-blur-0 transition-[backdrop-filter] duration-300 fixed top-0 left-64 z-30">
           <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
             AI Career Counselor
           </h1>
-          <p className="text-lg text-primary-light mt-2">
+          <p className="text-lg text-gray-900 mt-2">
             Your intelligent guide to a brighter professional future.
           </p>
         </header>
@@ -269,10 +269,12 @@ My Question: ${messageText}`;
         )}
 
         <main className="flex-1 p-6">
-          {renderCurrentPage()}
+          <div className="transition-all duration-500 ease-in-out transform animate-fade-in">
+            {renderCurrentPage()}
+          </div>
         </main>
 
-        <footer className="w-full p-6 text-center text-neutral-light/70 bg-white/5">
+        <footer className="w-full p-6 text-center text-white/80 bg-gradient-to-r from-primary-dark/60 to-secondary-dark/60">
           <p>&copy; {new Date().getFullYear()} AI Career Counselor. Powered by Gemini.</p>
         </footer>
       </div>
@@ -280,4 +282,3 @@ My Question: ${messageText}`;
   );
 };
 
-export default App;
