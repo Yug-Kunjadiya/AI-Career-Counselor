@@ -10,6 +10,7 @@ The core of this project is AI-driven resume analysis and career guidance.
 - Extracts key skills, experience, and education details.
 - Get tailored career suggestions and actionable advice.
 - Interactive AI chat for follow-up questions and guidance.
+- LinkedIn Profile Optimizer: AI suggestions for profile improvements with A/B testing
 
 ---
 
@@ -28,16 +29,20 @@ The core of this project is AI-driven resume analysis and career guidance.
 
 ## Demo
 #### Resume Analysis
-<img width="1915" height="868" alt="image" src="https://github.com/user-attachments/assets/d8ef0c45-5c24-4b73-9017-caaa0eba8110" />
+<img width="1917" height="911" alt="image" src="https://github.com/user-attachments/assets/312811bc-fb95-4a63-9086-4ec89d1d433d" />
 
 #### career Roadmap
-<img width="1915" height="868" alt="image" src="https://github.com/user-attachments/assets/dae8bf2d-78de-4e9a-a0b2-215684bd8435" />
+<img width="1919" height="921" alt="image" src="https://github.com/user-attachments/assets/81553195-34b5-470e-bfe1-19dae2e6d1cd" />
 
 #### skill Gap
-<img width="1848" height="856" alt="image" src="https://github.com/user-attachments/assets/7fb435a1-1389-409f-97fb-c355740c5021" />
+<img width="1919" height="914" alt="image" src="https://github.com/user-attachments/assets/2185c4b9-1380-4082-a997-32ec2d2529b5" />
+
+#### Profile Booster
+<img width="1919" height="1076" alt="image" src="https://github.com/user-attachments/assets/3ef53c0f-b1d3-4c65-9404-2f4bd0ad1a76" />
 
 #### ChatBox
-<img width="1907" height="856" alt="image" src="https://github.com/user-attachments/assets/e9a0ac84-40d0-45bf-9ce8-8aac8ac8133c" />
+<img width="1919" height="918" alt="image" src="https://github.com/user-attachments/assets/e7c36e87-992d-4f41-a7a2-c9ecb964d73b" />
+
 
 
  
