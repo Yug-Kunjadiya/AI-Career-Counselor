@@ -275,7 +275,7 @@ My Question: ${messageText}`;
         </main>
 
         <footer className="w-full p-6 text-center text-white/80 bg-gradient-to-r from-primary-dark/60 to-secondary-dark/60">
-          <p>&copy; {new Date().getFullYear()} AI Career Counselor. Powered by Gemini.</p>
+          <p>&copy; {new Date().getFullYear()} AI Career Counselor. Powered by Yug Kunjadiya.</p>
         </footer>
       </div>
     </div>

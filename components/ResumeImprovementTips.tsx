@@ -53,13 +53,13 @@ const ResumeImprovementTips: React.FC<ResumeImprovementTipsProps> = ({ resumeTex
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Resume Improvement Tips</h1>
-        <p className="text-gray-600">Get personalized suggestions to enhance your resume</p>
+        <h1 className="text-3xl font-bold text-white mb-2">Resume Improvement Tips</h1>
+        <p className="text-white">Get personalized suggestions to enhance your resume</p>
       </div>
 
       {!resumeText && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800">Please upload your resume first to get improvement tips.</p>
+          <p className="text-white">Please upload your resume first to get improvement tips.</p>
         </div>
       )}
 

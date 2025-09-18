@@ -55,8 +55,50 @@ const ATSScore: React.FC<ATSScoreProps> = ({ resumeText }) => {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">ATS Score Analysis</h1>
-        <p className="text-gray-600">Check how well your resume performs with Applicant Tracking Systems</p>
+        <h1 className="text-3xl font-bold text-white mb-2">ATS Score Analysis</h1>
+        <p className="text-white">Check how well your resume performs with Applicant Tracking Systems</p>
+      </div>
+
+      {/* About ATS Section */}
+      <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">About ATS (Applicant Tracking Systems)</h2>
+        <div className="space-y-4 text-gray-700">
+          <p>
+            <strong>What is an ATS?</strong> An Applicant Tracking System (ATS) is software used by employers and recruiters to collect, sort, scan, and rank job applications. Over 98% of Fortune 500 companies and 66% of large companies use ATS to manage their hiring process.
+          </p>
+          
+          <p>
+            <strong>How does ATS work?</strong> When you submit your resume online, it first goes through an ATS before reaching human recruiters. The system scans your resume for:
+          </p>
+          
+          <ul className="list-disc list-inside ml-4 space-y-2">
+            <li><strong>Keywords:</strong> Job-specific skills, technologies, and qualifications mentioned in the job posting</li>
+            <li><strong>Format compatibility:</strong> Simple, clean formatting that the system can easily parse</li>
+            <li><strong>Relevant experience:</strong> Work history that matches the job requirements</li>
+            <li><strong>Education and certifications:</strong> Required qualifications and credentials</li>
+          </ul>
+
+          <p>
+            <strong>Why is ATS Score important?</strong> Your ATS score determines whether your resume will be seen by human recruiters. A low ATS score means your resume might be automatically rejected before anyone reads it, regardless of your qualifications.
+          </p>
+
+          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mt-4">
+            <p className="text-blue-800">
+              <strong>💡 Pro Tip:</strong> Optimizing your resume for ATS doesn't mean keyword stuffing. Focus on naturally incorporating relevant skills and experiences that match the job description while maintaining readability for human reviewers.
+            </p>
+          </div>
+
+          <p>
+            <strong>What makes a good ATS score?</strong>
+          </p>
+          <ul className="list-disc list-inside ml-4 space-y-1">
+            <li><strong>90-100:</strong> Excellent - Your resume is highly optimized and likely to pass ATS filters</li>
+            <li><strong>80-89:</strong> Good - Minor improvements needed for better visibility</li>
+            <li><strong>70-79:</strong> Fair - Moderate optimization required to improve chances</li>
+            <li><strong>60-69:</strong> Poor - Significant improvements needed to pass ATS screening</li>
+            <li><strong>Below 60:</strong> Critical - Major restructuring required for ATS compatibility</li>
+          </ul>
+        </div>
       </div>
 
       {!resumeText && (
@@ -78,7 +120,7 @@ const ATSScore: React.FC<ATSScoreProps> = ({ resumeText }) => {
                 value={targetJob}
                 onChange={(e) => setTargetJob(e.target.value)}
                 placeholder="e.g., Software Engineer, Data Analyst"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
               />
             </div>
             <div className="flex items-end">

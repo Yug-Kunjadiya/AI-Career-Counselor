@@ -1,15 +1,10 @@
 import React, { useState, useRef, ReactFormEvent } from 'react';
-import { BotIcon, UserCircleIcon, LoadingSpinner, PaperAirplaneIcon } from './icons'; // Adjust import paths as needed
-
-interface Message {
-  id: string;
-  sender: 'user' | 'ai';
-  text: string;
-  timestamp: number;
-}
+import { BotIcon, UserCircleIcon, PaperAirplaneIcon } from './icons'; // Adjust import paths as needed
+import LoadingSpinner from './LoadingSpinner';
+import { ChatMessage } from '../types';
 
 interface AIChatProps {
-  chatHistory: Message[];
+  chatHistory: ChatMessage[];
   isLoading: boolean;
   onSendMessage: (message: string) => void;
   chatContainerRef: React.RefObject<HTMLDivElement>;

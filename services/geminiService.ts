@@ -1,5 +1,5 @@
 import { GoogleGenAI, Chat, GenerateContentResponse, HarmCategory, HarmBlockThreshold } from "@google/genai";
-import { ResumeData, CareerSuggestion, ATSScoreResult, ResumeImprovementTip, CareerRoadmap, InterviewQuestion, InterviewFeedback } from '../types';
+import { ResumeData, CareerSuggestion, ChatMessage, ATSScoreResult, ResumeImprovementTip, CareerRoadmap, InterviewQuestion, InterviewFeedback, LinkedInProfileAnalysis } from '../types';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
@@ -559,6 +559,103 @@ export const analyzeInterviewAnswer = async (question: string, answer: string, c
     return parsed;
   } catch (error) {
     console.error("Error analyzing interview answer from Gemini:", error);
+    throw error;
+  }
+};
+
+export const analyzeLinkedInProfile = async (profileText: string): Promise<LinkedInProfileAnalysis | null> => {
+  if (!ai) {
+    console.error("Gemini AI is not initialized. Cannot analyze LinkedIn profile.");
+    return null;
+  }
+
+  const prompt = `
+    Analyze the following LinkedIn profile text and provide a comprehensive analysis with improvement suggestions.
+    
+    LinkedIn Profile Text:
+    ${profileText}
+    
+    Please analyze and provide a JSON response with the following structure:
+    {
+      "overallScore": number (0-100),
+      "grade": string (A, B, C, D, or F),
+      "sections": {
+        "headline": {
+          "score": number (0-100),
+          "current": string,
+          "suggestions": [string array of 3-5 suggestions]
+        },
+        "summary": {
+          "score": number (0-100),
+          "current": string,
+          "suggestions": [string array of 3-5 suggestions]
+        },
+        "experience": {
+          "score": number (0-100),
+          "issues": [string array of identified issues],
+          "suggestions": [string array of 3-5 suggestions]
+        },
+        "skills": {
+          "score": number (0-100),
+          "missing": [string array of missing important skills],
+          "suggestions": [string array of 3-5 suggestions]
+        },
+        "education": {
+          "score": number (0-100),
+          "suggestions": [string array of 3-5 suggestions]
+        }
+      },
+      "keywordOptimization": {
+        "industryKeywords": [string array of relevant industry keywords found],
+        "missingKeywords": [string array of important missing keywords],
+        "keywordDensity": number (percentage)
+      },
+      "improvementSteps": [
+        {
+          "priority": "high" | "medium" | "low",
+          "section": string,
+          "action": string (detailed action to take),
+          "impact": string (expected impact),
+          "timeToComplete": string (estimated time)
+        }
+      ]
+    }
+    
+    Focus on:
+    1. Professional headline optimization
+    2. Summary/about section effectiveness
+    3. Work experience descriptions and achievements
+    4. Skills section completeness and relevance
+    5. Education section optimization
+    6. Industry keyword usage and SEO
+    7. Overall profile completeness and professional appeal
+    
+    Provide actionable, specific suggestions that will improve profile visibility and professional appeal.
+  `;
+
+  try {
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: TEXT_MODEL_NAME,
+      contents: [{ role: "user", parts: [{text: prompt}] }],
+      config: { ...generationConfig, responseMimeType: "application/json" },
+    });
+    const text = response.text;
+
+    if (!text) {
+      console.error("Empty response from Gemini for LinkedIn profile analysis");
+      return null;
+    }
+
+    const analysis = parseGeminiJsonResponse<LinkedInProfileAnalysis>(text);
+    
+    if (!analysis) {
+      console.error("Failed to parse LinkedIn profile analysis from Gemini response:", text);
+      return null;
+    }
+
+    return analysis;
+  } catch (error) {
+    console.error("Error analyzing LinkedIn profile from Gemini:", error);
     throw error;
   }
 };

@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
+  /* Theme colors will be dynamically set by ThemeContext */
   --primary: #0D47A1;
   --primary-light: #1976D2;
   --primary-dark: #000000;
@@ -16,6 +17,28 @@
   --background: #F0F4F8;
 }
 
+/* Theme-aware utility classes */
+.theme-bg-primary { background-color: var(--color-primary); }
+.theme-bg-secondary { background-color: var(--color-secondary); }
+.theme-bg-surface { background-color: var(--color-surface); }
+.theme-bg-surface-elevated { background-color: var(--color-surfaceElevated); }
+
+.theme-text-primary { color: var(--color-textPrimary); }
+.theme-text-secondary { color: var(--color-textSecondary); }
+.theme-text-muted { color: var(--color-textMuted); }
+
+.theme-border { border-color: var(--color-border); }
+.theme-border-light { border-color: var(--color-borderLight); }
+
+.theme-shadow-sm { box-shadow: var(--shadow-sm); }
+.theme-shadow-md { box-shadow: var(--shadow-md); }
+.theme-shadow-lg { box-shadow: var(--shadow-lg); }
+.theme-shadow-xl { box-shadow: var(--shadow-xl); }
+
+.theme-gradient-primary { background: var(--color-gradientPrimary); }
+.theme-gradient-secondary { background: var(--color-gradientSecondary); }
+.theme-gradient-accent { background: var(--color-gradientAccent); }
+
 * {
   box-sizing: border-box;
 }
@@ -28,7 +51,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--background);
+  background-color: var(--color-primary);
+  color: var(--color-textPrimary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #root {

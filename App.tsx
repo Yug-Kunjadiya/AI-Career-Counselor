@@ -2,16 +2,19 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ResumeData, CareerSuggestion, ChatMessage } from './types';
 import ResumeInput from './components/ResumeInput';
 import CareerSuggestionsDisplay from './components/CareerSuggestionsDisplay';
+import ProfileBooster from './components/ProfileBooster';
 import AIChat from './components/AIChat';
 import Sidebar from './components/Sidebar';
 import CareerRoadmap from './components/CareerRoadmap';
 import ATSScore from './components/ATSScore';
 import ResumeImprovementTips from './components/ResumeImprovementTips';
-import InterviewPreparation from './components/InterviewPreparation';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import ThemeToggle from './components/ThemeToggle';
 import { extractResumeDetails, suggestCareers, initializeChat, sendMessageToAIChatUpdated } from './services/geminiService';
-import { BriefcaseIcon, ChatBubbleLeftRightIcon, DocumentTextIcon, LightBulbIcon, WarningTriangleIcon } from './components/icons';
+import { ChatBubbleLeftRightIcon, DocumentTextIcon, LightBulbIcon, WarningTriangleIcon } from './components/icons';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { theme } = useTheme();
   const [apiKeyMissing, setApiKeyMissing] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<string>('resume-analysis');
   const [resumeText, setResumeText] = useState<string>('');
@@ -25,8 +28,9 @@ const App: React.FC = () => {
 
   const [errorResume, setErrorResume] = useState<string | null>(null);
   const [errorSuggestions, setErrorSuggestions] = useState<string | null>(null);
+  const [scrollY, setScrollY] = useState<number>(0);
 
-const chatContainerRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null!);
 
   useEffect(() => {
     if (!process.env.API_KEY) {
@@ -35,6 +39,13 @@ const chatContainerRef = useRef<HTMLDivElement>(null);
     } else {
       initializeChat();
     }
+
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   useEffect(() => {
@@ -56,13 +67,12 @@ const chatContainerRef = useRef<HTMLDivElement>(null);
     setIsLoadingResume(true);
     setErrorResume(null);
     setParsedResumeData(null);
-    setCareerSuggestions([]); // Clear previous suggestions
+    setCareerSuggestions([]);
 
     try {
       const data = await extractResumeDetails(resumeText);
       if (data) {
         setParsedResumeData(data);
-        // Automatically fetch suggestions after parsing
         await handleGetCareerSuggestions(data);
       } else {
         setErrorResume("Could not extract details from resume. The AI might have had trouble understanding the format or content.");
@@ -167,7 +177,6 @@ My Question: ${messageText}`;
       case 'resume-analysis':
         return (
           <div className="space-y-8">
-            {/* Resume Input Section */}
             <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
               <div className="flex items-center mb-4">
                 <DocumentTextIcon className="h-8 w-8 text-primary mr-3" />
@@ -192,7 +201,6 @@ My Question: ${messageText}`;
               )}
             </section>
 
-            {/* Career Suggestions Section - Conditionally render after resume analysis */}
             {(parsedResumeData || isLoadingSuggestions || errorSuggestions) && (
             <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
               <div className="flex items-center mb-4">
@@ -221,6 +229,9 @@ My Question: ${messageText}`;
           </div>
         );
 
+      case 'profile-booster':
+        return <ProfileBooster />;
+
       case 'chat':
         return (
           <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
@@ -243,17 +254,29 @@ My Question: ${messageText}`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-secondary-dark text-neutral-light flex">
+    <div className="min-h-screen theme-bg-primary flex transition-all duration-300">
       <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
 
       <div className="flex-1 flex flex-col">
-        <header className="w-full p-6 text-center bg-white/10 backdrop-blur-sm">
-          <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-            AI Career Counselor
-          </h1>
-          <p className="text-lg text-primary-light mt-2">
-            Your intelligent guide to a brighter professional future.
-          </p>
+        <header 
+          className="fixed top-0 left-64 right-0 z-30 theme-bg-surface theme-shadow-lg transition-all duration-300"
+          style={{
+            backdropFilter: scrollY > 50 ? 'blur(20px)' : 'blur(10px)',
+            borderBottom: `1px solid ${theme.colors.border}`,
+            backgroundColor: scrollY > 50 ? theme.colors.surface + 'E6' : theme.colors.surface,
+          }}
+        >
+          <div className="flex flex-col items-center relative">
+            <div className="absolute top-0 right-0">
+              <ThemeToggle />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold theme-text-primary drop-shadow-lg leading-tight">
+              AI Career Counselor
+            </h1>
+            <p className="text-base md:text-lg theme-text-secondary mt-3 max-w-xl">
+              Your intelligent guide to a brighter professional future.
+            </p>
+          </div>
         </header>
 
         {apiKeyMissing && (
@@ -268,15 +291,25 @@ My Question: ${messageText}`;
           </div>
         )}
 
-        <main className="flex-1 p-6">
-          {renderCurrentPage()}
+        <main className="flex-1 p-6 pt-40">
+          <div className="transition-all duration-500 ease-in-out transform animate-fade-in">
+            {renderCurrentPage()}
+          </div>
         </main>
 
-        <footer className="w-full p-6 text-center text-neutral-light/70 bg-white/5">
-          <p>&copy; {new Date().getFullYear()} AI Career Counselor. Powered by Gemini.</p>
+        <footer className="w-full p-6 text-center theme-bg-secondary theme-text-secondary transition-all duration-300">
+          <p>&copy; {new Date().getFullYear()} AI Career Counselor. Powered by Yug Kunjadiya.</p>
         </footer>
       </div>
     </div>
+  );
+};
+
+const App: React.FC = () => {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 };
 

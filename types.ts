@@ -104,9 +104,52 @@ export interface CareerReport {
   generatedAt: Date;
 }
 
-export type PageType = 'resume-analysis' | 'career-roadmap' | 'skill-gap' | 'chat';
+export type PageType = 'resume-analysis' | 'career-roadmap' | 'skill-gap' | 'profile-booster' | 'chat';
 
 export interface ThemeContextType {
   isDark: boolean;
   toggleTheme: () => void;
+}
+
+export interface LinkedInProfileAnalysis {
+  overallScore: number; // 0-100
+  grade: string; // A, B, C, D, F
+  sections: {
+    headline: {
+      score: number;
+      current: string;
+      suggestions: string[];
+    };
+    summary: {
+      score: number;
+      current: string;
+      suggestions: string[];
+    };
+    experience: {
+      score: number;
+      issues: string[];
+      suggestions: string[];
+    };
+    skills: {
+      score: number;
+      missing: string[];
+      suggestions: string[];
+    };
+    education: {
+      score: number;
+      suggestions: string[];
+    };
+  };
+  keywordOptimization: {
+    industryKeywords: string[];
+    missingKeywords: string[];
+    keywordDensity: number;
+  };
+  improvementSteps: {
+    priority: 'high' | 'medium' | 'low';
+    section: string;
+    action: string;
+    impact: string;
+    timeToComplete: string;
+  }[];
 }
