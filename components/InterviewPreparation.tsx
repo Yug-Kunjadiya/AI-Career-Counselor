@@ -86,8 +86,8 @@ const InterviewPreparation: React.FC<InterviewPreparationProps> = ({ resumeData 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Interview Preparation</h1>
-        <p className="text-gray-600">Practice with personalized interview questions and get feedback</p>
+        <h1 className="text-3xl font-bold theme-text-primary mb-2">Interview Preparation</h1>
+        <p className="theme-text-secondary">Practice with personalized interview questions and get feedback</p>
       </div>
 
       {!resumeData && (

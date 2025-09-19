@@ -10,7 +10,7 @@ import ResumeImprovementTips from './components/ResumeImprovementTips';
 import InterviewPreparation from './components/InterviewPreparation';
 import { extractResumeDetails, suggestCareers, initializeChat, sendMessageToAIChatUpdated } from './services/geminiService';
 import { BriefcaseIcon, ChatBubbleLeftRightIcon, DocumentTextIcon, LightBulbIcon, WarningTriangleIcon } from './components/icons';
-import useScrollBlur from './hooks/useScrollBlur';
+import useScrollBlur from './src/hooks/useScrollBlur';
 
 const App: React.FC = () => {
   const [apiKeyMissing, setApiKeyMissing] = useState<boolean>(false);
@@ -27,11 +27,11 @@ const App: React.FC = () => {
   const [errorResume, setErrorResume] = useState<string | null>(null);
   const [errorSuggestions, setErrorSuggestions] = useState<string | null>(null);
 
-  const chatContainerRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
 
   const blurAmount = useScrollBlur(10, 300);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!process.env.API_KEY) {
       setApiKeyMissing(true);
       console.warn("Gemini API Key (process.env.API_KEY) is not set. AI features will not work.");
@@ -40,13 +40,13 @@ const App: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (chatContainerRef.current) {
       chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
     }
   }, [chatHistory]);
 
-  const handleAnalyzeResume = useCallback(async () => {
+  const handleAnalyzeResume = React.useCallback(async () => {
     if (!resumeText.trim()) {
       setErrorResume("Please paste your resume text first.");
       return;
@@ -77,7 +77,7 @@ const App: React.FC = () => {
     }
   }, [resumeText, apiKeyMissing]);
 
-  const handleGetCareerSuggestions = useCallback(async (currentResumeData: ResumeData) => {
+  const handleGetCareerSuggestions = React.useCallback(async (currentResumeData: ResumeData) => {
     if (apiKeyMissing) {
         setErrorSuggestions("API Key is missing. Cannot fetch suggestions.");
         return;
@@ -99,7 +99,7 @@ const App: React.FC = () => {
     }
   }, [apiKeyMissing]);
 
-  const handleSendMessage = useCallback(async (messageText: string) => {
+  const handleSendMessage = React.useCallback(async (messageText: string) => {
     if (!messageText.trim()) return;
      if (apiKeyMissing) {
         const aiMessage: ChatMessage = {
@@ -110,6 +110,23 @@ const App: React.FC = () => {
         };
         setChatHistory(prev => [...prev, aiMessage]);
         return;
+    }
+
+    // Pre-query classification to block non-career questions
+    const lowerMessage = messageText.toLowerCase();
+    const careerKeywords = [
+      'career', 'resume', 'job', 'skill', 'interview', 'professional', 'development', 'work', 'employment', 'linkedin', 'networking', 'promotion', 'salary', 'hiring', 'recruiter', 'cover letter', 'cv', 'portfolio', 'freelance', 'internship', 'mentor', 'training', 'career path', 'job search', 'career advice'
+    ];
+    const isCareerRelated = careerKeywords.some(keyword => lowerMessage.includes(keyword));
+    if (!isCareerRelated) {
+      const refusalMessage: ChatMessage = {
+        id: crypto.randomUUID(),
+        sender: 'ai',
+        text: "I'm sorry, I can only provide answers related to career guidance, resume, skills, job advice, and professional development.",
+        timestamp: new Date(),
+      };
+      setChatHistory(prev => [...prev, refusalMessage]);
+      return;
     }
 
     const newUserMessage: ChatMessage = {
@@ -124,7 +141,64 @@ const App: React.FC = () => {
     try {
       let promptForAI = messageText;
       if (parsedResumeData) {
+        const systemPrompt = `You are an AI career counselor. You only answer questions related to career guidance, resume, skills, job advice, and professional development. If a question is outside this scope, politely refuse to answer and state that you only provide career-related advice.`;
         const resumeContext = `
+${systemPrompt}
+
+Context: The following information is from my (the user's) resume. Please use it to answer my question accurately.
+--- My Resume Information ---
+Profile Summary: ${parsedResumeData.profileSummary || "Not specified."}
+Skills: ${parsedResumeData.skills.length > 0 ? parsedResumeData.skills.join(', ') : "Not specified."}
+Experience Summary: ${parsedResumeData.experienceSummary || "Not specified."}
+Education Level: ${parsedResumeData.educationLevel || "Not specified."}
+--- End of Resume Information ---
+
+My Question: ${messageText}`;
+        promptForAI = resumeContext;
+      }
+
+      const aiResponseText = await sendMessageToAIChatUpdated(promptForAI);
+
+      if (aiResponseText) {
+        const aiMessage: ChatMessage = {
+          id: crypto.randomUUID(),
+          sender: 'ai',
+          text: aiResponseText,
+          timestamp: new Date(),
+        };
+        setChatHistory(prev => [...prev, aiMessage]);
+      } else {
+        throw new Error("Received an empty response from AI.");
+      }
+    } catch (err) {
+      console.error("Error sending message to AI chat:", err);
+      const errorMessage: ChatMessage = {
+        id: crypto.randomUUID(),
+        sender: 'ai',
+        text: `Sorry, I encountered an error. ${err instanceof Error ? err.message : 'Please try again.'}`,
+        timestamp: new Date(),
+      };
+      setChatHistory(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoadingChat(false);
+    }
+
+    const newUserMessage: ChatMessage = {
+      id: crypto.randomUUID(),
+      sender: 'user',
+      text: messageText,
+      timestamp: new Date(),
+    };
+    setChatHistory(prev => [...prev, newUserMessage]);
+    setIsLoadingChat(true);
+
+    try {
+      let promptForAI = messageText;
+      if (parsedResumeData) {
+        const systemPrompt = `You are an AI career counselor. You only answer questions related to career guidance, resume, skills, job advice, and professional development. If a question is outside this scope, politely refuse to answer and state that you only provide career-related advice.`;
+        const resumeContext = `
+${systemPrompt}
+
 Context: The following information is from my (the user's) resume. Please use it to answer my question accurately.
 --- My Resume Information ---
 Profile Summary: ${parsedResumeData.profileSummary || "Not specified."}
@@ -168,74 +242,80 @@ My Question: ${messageText}`;
     switch (currentPage) {
       case 'resume-analysis':
         return (
-          <div className="space-y-8">
-            <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
-              <div className="flex items-center mb-4">
-                <DocumentTextIcon className="h-8 w-8 text-primary mr-3" />
-                <h2 className="text-2xl font-semibold text-primary-dark">Resume Analysis</h2>
-              </div>
-              <ResumeInput
-                resumeText={resumeText}
-                setResumeText={setResumeText}
-                onAnalyze={handleAnalyzeResume}
-                isLoading={isLoadingResume}
-                error={errorResume}
-              />
-              {isLoadingResume && <p className="text-primary mt-2">Analyzing your resume with AI...</p>}
-              {parsedResumeData && !isLoadingResume && (
-                <div className="mt-6 p-4 bg-primary-light/10 rounded-lg border border-primary-light">
-                  <h3 className="text-xl font-semibold text-primary-dark mb-2">Resume Snapshot:</h3>
-                  <p><strong>Summary:</strong> {parsedResumeData.profileSummary}</p>
-                  <p><strong>Skills:</strong> {parsedResumeData.skills.join(', ')}</p>
-                  <p><strong>Experience:</strong> {parsedResumeData.experienceSummary}</p>
-                  <p><strong>Education:</strong> {parsedResumeData.educationLevel}</p>
-                </div>
-              )}
-            </section>
-
-            {(parsedResumeData || isLoadingSuggestions || errorSuggestions) && (
-            <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
-              <div className="flex items-center mb-4">
-                <LightBulbIcon className="h-8 w-8 text-secondary mr-3" />
-                <h2 className="text-2xl font-semibold text-secondary-dark">Career Suggestions</h2>
-              </div>
-              {isLoadingSuggestions && <p className="text-secondary mt-2">Generating career suggestions based on your profile...</p>}
-              <CareerSuggestionsDisplay
-                suggestions={careerSuggestions}
-                isLoading={isLoadingSuggestions}
-                error={errorSuggestions}
-              />
-            </section>
-            )}
-          </div>
-        );
++         <div className="max-w-5xl mx-auto px-6 space-y-8">
++           <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
++             <div className="flex items-center mb-4">
++               <DocumentTextIcon className="h-8 w-8 text-primary mr-3" />
++               <h2 className="text-2xl font-semibold text-primary-dark">Resume Analysis</h2>
++             </div>
++             <ResumeInput
++               resumeText={resumeText}
++               setResumeText={setResumeText}
++               onAnalyze={handleAnalyzeResume}
++               isLoading={isLoadingResume}
++               error={errorResume}
++             />
++             {isLoadingResume && <p className="text-primary mt-2">Analyzing your resume with AI...</p>}
++             {parsedResumeData && !isLoadingResume && (
++               <div className="mt-6 p-4 bg-primary-light/10 rounded-lg border border-primary-light">
++                 <h3 className="text-xl font-semibold text-primary-dark mb-2">Resume Snapshot:</h3>
++                 <p><strong>Summary:</strong> {parsedResumeData.profileSummary}</p>
++                 <p><strong>Skills:</strong> {parsedResumeData.skills.join(', ')}</p>
++                 <p><strong>Experience:</strong> {parsedResumeData.experienceSummary}</p>
++                 <p><strong>Education:</strong> {parsedResumeData.educationLevel}</p>
++               </div>
++             )}
++           </section>
++
++           {(parsedResumeData || isLoadingSuggestions || errorSuggestions) && (
++           <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
++             <div className="flex items-center mb-4">
++               <LightBulbIcon className="h-8 w-8 text-secondary mr-3" />
++               <h2 className="text-2xl font-semibold text-secondary-dark">Career Suggestions</h2>
++             </div>
++             {isLoadingSuggestions && <p className="text-secondary mt-2">Generating career suggestions based on your profile...</p>}
++             <CareerSuggestionsDisplay
++               suggestions={careerSuggestions}
++               isLoading={isLoadingSuggestions}
++               error={errorSuggestions}
++             />
++           </section>
++           )}
++         </div>
++        );
 
       case 'career-roadmap':
-        return <CareerRoadmap resumeData={parsedResumeData} />;
+        return (
++         <div className="max-w-5xl mx-auto px-6">
++           <CareerRoadmap resumeData={parsedResumeData} />
++         </div>
++        );
 
       case 'skill-gap':
         return (
-          <div className="space-y-6">
-            <ATSScore resumeText={resumeText} />
-            <ResumeImprovementTips resumeText={resumeText} />
-          </div>
-        );
++         <div className="max-w-5xl mx-auto px-6 space-y-6">
++           <ATSScore resumeText={resumeText} />
++           <ResumeImprovementTips resumeText={resumeText} />
++         </div>
++        );
 
       case 'chat':
         return (
-          <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
-             <div className="flex items-center mb-4">
-              <ChatBubbleLeftRightIcon className="h-8 w-8 text-accent mr-3" />
-              <h2 className="text-2xl font-semibold text-accent-dark">Chat with Your AI Counselor</h2>
-            </div>
-            <AIChat
-              chatHistory={chatHistory}
-              onSendMessage={handleSendMessage}
-              isLoading={isLoadingChat}
-              chatContainerRef={chatContainerRef}
-            />
-          </section>
-        );
++         <div className="max-w-5xl mx-auto px-6">
++           <section className="bg-white/90 backdrop-blur-sm p-6 rounded-xl shadow-2xl text-neutral-dark">
++             <div className="flex items-center mb-4">
++               <ChatBubbleLeftRightIcon className="h-8 w-8 text-accent mr-3" />
++               <h2 className="text-2xl font-semibold text-accent-dark">Chat with Your AI Counselor</h2>
++             </div>
++             <AIChat
++               chatHistory={chatHistory}
++               onSendMessage={handleSendMessage}
++               isLoading={isLoadingChat}
++               chatContainerRef={chatContainerRef}
++             />
++           </section>
++         </div>
++        );
 
       default:
         return <div>Page not found</div>;
@@ -251,7 +331,7 @@ My Question: ${messageText}`;
           <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
             AI Career Counselor
           </h1>
-          <p className="text-lg text-gray-900 mt-2">
+          <p className="text-lg theme-text-secondary mt-2">
             Your intelligent guide to a brighter professional future.
           </p>
         </header>

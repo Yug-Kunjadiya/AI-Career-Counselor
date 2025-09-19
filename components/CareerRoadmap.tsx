@@ -57,8 +57,8 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({ resumeData }) => {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-white mb-2">Career Roadmap</h1>
-        <p className="text-white">Get a personalized roadmap to achieve your career goals</p>
+        <h1 className="text-3xl font-bold theme-text-primary mb-2">Career Roadmap</h1>
+        <p className="theme-text-secondary">Get a personalized roadmap to achieve your career goals</p>
       </div>
 
       {!resumeData && (

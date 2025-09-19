@@ -75,8 +75,8 @@ const ProfileBooster: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-white mb-2">Profile Booster</h1>
-        <p className="text-white">AI-powered LinkedIn profile optimization with actionable insights</p>
+        <h1 className="text-3xl font-bold theme-text-primary mb-2">Profile Booster</h1>
+        <p className="theme-text-secondary">AI-powered LinkedIn profile optimization with actionable insights</p>
       </div>
 
       {/* About Section */}

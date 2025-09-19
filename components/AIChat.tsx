@@ -1,4 +1,4 @@
-import React, { useState, useRef, ReactFormEvent } from 'react';
+import React, { useState, useRef, FormEvent } from 'react';
 import { BotIcon, UserCircleIcon, PaperAirplaneIcon } from './icons'; // Adjust import paths as needed
 import LoadingSpinner from './LoadingSpinner';
 import { ChatMessage } from '../types';
@@ -7,7 +7,7 @@ interface AIChatProps {
   chatHistory: ChatMessage[];
   isLoading: boolean;
   onSendMessage: (message: string) => void;
-  chatContainerRef: React.RefObject<HTMLDivElement>;
+  chatContainerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const AIChat: React.FC<AIChatProps> = ({ chatHistory, isLoading, onSendMessage, chatContainerRef }) => {
@@ -35,7 +35,7 @@ const AIChat: React.FC<AIChatProps> = ({ chatHistory, isLoading, onSendMessage, 
 
   const [newMessage, setNewMessage] = useState<string>('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!newMessage.trim() || isLoading) return;
     onSendMessage(newMessage);
