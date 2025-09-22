@@ -143,7 +143,11 @@ Education Level: ${parsedResumeData.educationLevel || "Not specified."}
 
 My Question: ${messageText}`;
         promptForAI = resumeContext;
-      }
+      } else {
+  promptForAI = `You are a career counselor AI. Please only answer questions related to career advice, job searching, resume building, interview preparation, and professional development. If asked about anything else, politely redirect the conversation back to career-related topics.
+
+My Question: ${messageText}`;
+}
 
       const aiResponseText = await sendMessageToAIChatUpdated(promptForAI);
 
