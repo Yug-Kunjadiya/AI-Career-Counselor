@@ -276,12 +276,15 @@ const InterviewResponseBuilder: React.FC = () => {
           <div className="flex gap-4 justify-center">
             <motion.button
               onClick={startGame}
-              className="flex items-center px-8 py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              className="flex items-center px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 text-lg"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <PlayIcon className="w-5 h-5 mr-2" />
-              Start Interview Challenge
+              <PlayIcon className="w-6 h-6 mr-3" />
+              🚀 Start Playing Now!
+              <div className="ml-3 text-sm font-normal opacity-90">
+                (Takes 5-10 minutes)
+              </div>
             </motion.button>
             
             {questionsAnswered > 0 && (
@@ -309,14 +312,30 @@ const InterviewResponseBuilder: React.FC = () => {
       transition={{ duration: 0.6 }}
     >
       {/* Game Header */}
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-neutral-dark">Interview Response Builder</h2>
-          <p className="text-neutral-dark/70">Question {questionsAnswered + 1} of 3</p>
+      <div className="mb-6">
+        <div className="flex justify-between items-center mb-4">
+          <div>
+            <h2 className="text-2xl font-bold text-neutral-dark">🎮 Interview Response Builder</h2>
+            <p className="text-neutral-dark/70">Question {questionsAnswered + 1} of 3</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-neutral-dark/70">Total Score</p>
+            <p className="text-2xl font-bold text-primary">{totalScore}pts</p>
+          </div>
         </div>
-        <div className="text-right">
-          <p className="text-sm text-neutral-dark/70">Total Score</p>
-          <p className="text-2xl font-bold text-primary">{totalScore}pts</p>
+        
+        {/* Progress Bar */}
+        <div className="w-full bg-neutral-200 rounded-full h-3 mb-2">
+          <motion.div 
+            className="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-500"
+            style={{ width: `${((questionsAnswered) / 3) * 100}%` }}
+            initial={{ width: 0 }}
+            animate={{ width: `${((questionsAnswered) / 3) * 100}%` }}
+          />
+        </div>
+        <div className="flex justify-between text-xs text-neutral-500">
+          <span>Progress: {Math.round(((questionsAnswered) / 3) * 100)}% complete</span>
+          <span>{3 - questionsAnswered} questions remaining</span>
         </div>
       </div>
 
@@ -546,43 +565,61 @@ const InterviewResponseBuilder: React.FC = () => {
       <AnimatePresence>
         {showFeedback && (
           <motion.div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="bg-white rounded-xl p-8 max-w-lg w-full shadow-2xl"
+              className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl my-8 max-h-[90vh] overflow-y-auto"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
             >
               <div className="text-center">
-                <h3 className="text-2xl font-bold mb-4 text-neutral-dark">Response Feedback</h3>
+                <h3 className="text-xl font-bold mb-3 text-neutral-dark">Response Feedback</h3>
                 
-                <div className={`text-6xl font-bold mb-4 ${getScoreColor(score)}`}>
+                <div className={`text-5xl font-bold mb-3 ${getScoreColor(score)}`}>
                   {score}%
                 </div>
                 
-                <p className="text-lg mb-6 text-neutral-dark/70">
+                <p className="text-base mb-4 text-neutral-dark/70">
                   {getScoreFeedback(score)}
                 </p>
 
-                <div className="bg-neutral-50 rounded-lg p-4 mb-6 text-left">
-                  <h4 className="font-semibold mb-2 text-neutral-dark">Tips for Improvement:</h4>
-                  <ul className="text-sm text-neutral-dark/70 space-y-1">
-                    <li>• Use specific examples with measurable results</li>
-                    <li>• Follow the STAR method structure</li>
-                    <li>• Include relevant details about your actions</li>
-                    <li>• Quantify your achievements when possible</li>
+                {/* Score Breakdown */}
+                <div className="bg-neutral-50 rounded-lg p-3 mb-4 text-left">
+                  <h4 className="font-semibold mb-2 text-sm text-neutral-dark">📊 Your Score Breakdown:</h4>
+                  <div className="space-y-1 text-xs">
+                    <div className="flex justify-between">
+                      <span>Response Parts Used:</span>
+                      <span className="font-medium">{selectedComponents.length}/4</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Quality Bonus:</span>
+                      <span className="font-medium">
+                        {selectedComponents.filter(c => c.quality === 'excellent').length} excellent, {' '}
+                        {selectedComponents.filter(c => c.quality === 'good').length} good
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-50 rounded-lg p-3 mb-4 text-left">
+                  <h4 className="font-semibold mb-2 text-sm text-blue-800">💡 How to Get 100% Next Time:</h4>
+                  <ul className="text-xs text-blue-700 space-y-1">
+                    <li>• Choose 4 parts: Opener + Situation + Action + Result</li>
+                    <li>• Pick ⭐ "Best" quality components when possible</li>
+                    <li>• Include specific numbers and measurable outcomes</li>
+                    <li>• Make sure your story flows logically</li>
                   </ul>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-2 pt-3 border-t border-neutral-200">
                   {questionsAnswered < 3 ? (
                     <motion.button
                       onClick={nextQuestion}
-                      className="flex-1 px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg transition-all duration-300"
+                      className="flex-1 px-4 py-2 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg transition-all duration-300 text-sm"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -591,7 +628,7 @@ const InterviewResponseBuilder: React.FC = () => {
                   ) : (
                     <motion.button
                       onClick={() => setGameStarted(false)}
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-primary to-secondary text-white font-semibold rounded-lg transition-all duration-300"
+                      className="flex-1 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white font-medium rounded-lg transition-all duration-300 text-sm"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
