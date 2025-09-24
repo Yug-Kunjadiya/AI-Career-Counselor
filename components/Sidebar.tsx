@@ -14,6 +14,7 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate }) => {
     { id: 'career-roadmap', label: 'Career Roadmap' },
     { id: 'skill-gap', label: 'Skill Gap' },
     { id: 'profile-booster', label: 'Profile Booster' },
+    { id: 'interview-game', label: 'Interview Game' },
     { id: 'chat', label: 'Chat' },
   ];
 

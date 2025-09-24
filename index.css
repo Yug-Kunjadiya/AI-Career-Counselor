@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 @import './landing.css';
 @import './landing-premium.css';
+@import './interview-game.css';
 
 :root {
   /* Theme colors will be dynamically set by ThemeContext */

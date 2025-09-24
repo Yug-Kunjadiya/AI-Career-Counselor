@@ -1,0 +1,80 @@
+/* Interview Response Builder Game Styles */
+.interview-game-container {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+.response-component {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.response-component:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.game-card {
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.score-animation {
+  animation: scorePopIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes scorePopIn {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.drag-zone {
+  transition: all 0.3s ease;
+}
+
+.drag-zone:hover {
+  border-color: rgb(59 130 246 / 0.5);
+  background-color: rgb(59 130 246 / 0.02);
+}
+
+.quality-excellent {
+  border-left: 4px solid #10b981;
+}
+
+.quality-good {
+  border-left: 4px solid #f59e0b;
+}
+
+.quality-poor {
+  border-left: 4px solid #ef4444;
+}
+
+/* Custom scrollbar for component list */
+.component-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.component-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.component-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.component-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

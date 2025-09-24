@@ -9,10 +9,11 @@ import Sidebar from './components/Sidebar';
 import CareerRoadmap from './components/CareerRoadmap';
 import ATSScore from './components/ATSScore';
 import ResumeImprovementTips from './components/ResumeImprovementTips';
+import InterviewResponseBuilder from './components/InterviewResponseBuilder';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import ThemeToggle from './components/ThemeToggle';
 import { extractResumeDetails, suggestCareers, initializeChat, sendMessageToAIChatUpdated } from './services/geminiService';
-import { ChatBubbleLeftRightIcon, DocumentTextIcon, LightBulbIcon, WarningTriangleIcon } from './components/icons';
+import { ChatBubbleLeftRightIcon, DocumentTextIcon, LightBulbIcon, WarningTriangleIcon, PlayIcon } from './components/icons';
 
 const AppContent: React.FC = () => {
   const { theme } = useTheme();
@@ -238,6 +239,17 @@ My Question: ${messageText}`;
 
       case 'profile-booster':
         return <ProfileBooster />;
+
+      case 'interview-game':
+        return (
+          <section>
+            <div className="flex items-center mb-6">
+              <PlayIcon className="h-8 w-8 text-primary mr-3" />
+              <h2 className="text-3xl font-semibold text-primary-dark">Interview Response Builder</h2>
+            </div>
+            <InterviewResponseBuilder />
+          </section>
+        );
 
       case 'chat':
         return (
