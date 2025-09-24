@@ -43,7 +43,7 @@ const AIChat: React.FC<AIChatProps> = ({ chatHistory, isLoading, onSendMessage, 
   };
 
   return (
-    <div className="flex flex-col h-[500px] bg-neutral-light/50 rounded-lg shadow-inner">
+    <div className="flex flex-col h-[400px] bg-neutral-light/50 rounded-lg shadow-inner">
       <div ref={chatContainerRef} className="flex-grow p-4 space-y-4 overflow-y-auto scroll-smooth">
         {chatHistory.map((msg) => (
           <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -87,14 +87,14 @@ const AIChat: React.FC<AIChatProps> = ({ chatHistory, isLoading, onSendMessage, 
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Ask your AI career counselor..."
-            className="flex-grow p-3 border border-neutral-light/30 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent transition-colors duration-200 bg-neutral-dark text-neutral-light placeholder:text-neutral-light/70"
+            className="flex-grow p-2 border border-neutral-light/30 rounded-lg focus:ring-2 focus:ring-accent focus:border-accent transition-colors duration-200 bg-neutral-dark text-neutral-light placeholder:text-neutral-light/70"
             disabled={isLoading}
             aria-label="Chat input"
           />
           <button
             type="submit"
             disabled={isLoading || !newMessage.trim()}
-            className="p-3 bg-accent hover:bg-accent/90 text-white rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-accent/70 focus:ring-offset-1 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+            className="p-2 bg-accent hover:bg-accent/90 text-white rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-accent/70 focus:ring-offset-1 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
             aria-label="Send chat message"
           >
             <PaperAirplaneIcon className="w-5 h-5" />

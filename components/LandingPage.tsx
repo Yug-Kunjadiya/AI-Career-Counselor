@@ -325,19 +325,7 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               transition={{ type: "spring", damping: 10, stiffness: 100, delay: 0.5 }}
             >
               <Sparkles size={16} />
-              <span>Powered by Advanced AI</span>
-              <motion.div
-                className="badge-glow"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.5, 0.8, 0.5],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Number.POSITIVE_INFINITY,
-                  ease: "easeInOut"
-                }}
-              />
+              <span>Trusted Career Guidance</span>
             </motion.div>
 
             {/* Ultra-Premium Title */}
@@ -351,7 +339,7 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.8, duration: 0.8 }}
               >
-                Transform Your Career
+                Land Your Dream Job
               </motion.span>
               <motion.span
                 className="title-line title-gradient"
@@ -359,7 +347,7 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 1.0, duration: 0.8 }}
               >
-                With AI Precision
+                With Smart Insights
               </motion.span>
               <motion.span
                 className="title-line"
@@ -367,7 +355,7 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.2, duration: 0.8 }}
               >
-                & Expert Guidance
+                & Personal Guidance
               </motion.span>
             </motion.h1>
 
@@ -377,8 +365,8 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               variants={itemVariants}
               transition={{ delay: 1.4 }}
             >
-              Experience the future of career development with our revolutionary AI-powered platform. 
-              Get personalized insights, real-time feedback, and strategic guidance that adapts to your unique journey.
+              Get expert career advice that actually works. Practice interviews 
+              and discover opportunities that match your skills and goals. Real results from real career experts.
             </motion.p>
 
             {/* Premium CTA Buttons */}
@@ -396,19 +384,7 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 whileTap={{ scale: 0.95 }}
                 onClick={onGetStarted}
               >
-                <span>Start Your Journey</span>
-                <motion.div
-                  className="button-glow"
-                  animate={{
-                    x: [-100, 200],
-                    opacity: [0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: "easeInOut"
-                  }}
-                />
+                <span>Get Career Help Now</span>
                 <Rocket size={20} />
               </motion.button>
 
@@ -430,52 +406,21 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
               transition={{ delay: 1.8 }}
             >
               <div className="trust-item">
-                <div className="trust-number">50K+</div>
-                <div className="trust-label">Careers Transformed</div>
+                <div className="trust-number">2,400+</div>
+                <div className="trust-label">People Helped</div>
               </div>
               <div className="trust-item">
-                <div className="trust-number">98%</div>
-                <div className="trust-label">Success Rate</div>
+                <div className="trust-number">85%</div>
+                <div className="trust-label">Get Interviews</div>
               </div>
               <div className="trust-item">
-                <div className="trust-number">4.9/5</div>
-                <div className="trust-label">User Rating</div>
+                <div className="trust-number">24/7</div>
+                <div className="trust-label">Career Support</div>
               </div>
             </motion.div>
           </motion.div>
 
-          {/* 3D Floating Cards */}
-          <motion.div className="floating-cards-3d">
-            <FloatingCard className="floating-card-1" delay={0}>
-              <div className="card-content-3d">
-                <Brain className="card-icon-3d" />
-                <div className="card-text-3d">
-                  <div className="card-title-3d">AI Analysis</div>
-                  <div className="card-value-3d">Advanced</div>
-                </div>
-              </div>
-            </FloatingCard>
 
-            <FloatingCard className="floating-card-2" delay={1}>
-              <div className="card-content-3d">
-                <TrendingUp className="card-icon-3d" />
-                <div className="card-text-3d">
-                  <div className="card-title-3d">Success Rate</div>
-                  <div className="card-value-3d">98.5%</div>
-                </div>
-              </div>
-            </FloatingCard>
-
-            <FloatingCard className="floating-card-3" delay={2}>
-              <div className="card-content-3d">
-                <Users className="card-icon-3d" />
-                <div className="card-text-3d">
-                  <div className="card-title-3d">Active Users</div>
-                  <div className="card-value-3d">50K+</div>
-                </div>
-              </div>
-            </FloatingCard>
-          </motion.div>
         </div>
 
         {/* Scroll Indicator */}
@@ -718,22 +663,7 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                 <div className="demo-interactive-3d">
                   {/* 3D Interactive Demo Elements */}
                   <div className="demo-stage">
-                    <motion.div 
-                      className="demo-card-3d resume-card"
-                      animate={{
-                        rotateY: [0, 15, 0],
-                        y: [-10, 10, -10],
-                      }}
-                      transition={{
-                        duration: 4,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      <FileText size={32} />
-                      <span>Resume Analysis</span>
-                      <div className="card-glow"></div>
-                    </motion.div>
+
 
                     <motion.div 
                       className="demo-card-3d ai-brain"
@@ -749,8 +679,8 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                         delay: 0.5
                       }}
                     >
-                      <Brain size={40} />
-                      <span>AI Processing</span>
+                      <MessageSquare size={40} />
+                      <span>Interview Prep</span>
                       <div className="card-glow ai-glow"></div>
                     </motion.div>
 
@@ -767,8 +697,8 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                         delay: 1
                       }}
                     >
-                      <BarChart3 size={32} />
-                      <span>Career Insights</span>
+                      <Award size={32} />
+                      <span>Job Offers</span>
                       <div className="card-glow results-glow"></div>
                     </motion.div>
                   </div>
@@ -802,8 +732,8 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                   </div>
 
                   <div className="demo-description">
-                    <h4>Experience AI-Powered Career Analysis</h4>
-                    <p>Watch how our advanced AI processes your resume and generates personalized career insights in real-time.</p>
+                    <h4>See How We Help You Get Hired</h4>
+                    <p>From career planning to interview prep, we guide you through every step of landing your next job.</p>
                   </div>
 
                   <motion.button
@@ -819,20 +749,8 @@ const PremiumLandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
                       onGetStarted();
                     }}
                   >
-                    <span>Experience Full AI Analysis</span>
-                    <motion.div
-                      animate={{
-                        x: [0, 5, 0],
-                        opacity: [0.5, 1, 0.5],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    >
-                      <Rocket size={20} />
-                    </motion.div>
+                    <span>Start My Career Review</span>
+                    <Rocket size={20} />
                   </motion.button>
                 </div>
               </div>

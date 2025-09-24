@@ -53,8 +53,8 @@ const Sidebar: React.FC<SidebarProps> = ({ currentPage, onNavigate }) => {
       </ul>
       
       <div className="p-6 border-t theme-border text-sm theme-text-muted text-center">
-        <p>&copy; 2024 AI Career Counselor</p>
-        <p className="text-xs mt-1 theme-text-muted opacity-75">Powered by AI</p>
+        <p>&copy; 2025 AI Career Counselor</p>
+        <p className="text-xs mt-1 theme-text-muted opacity-75">Powered by YUG KUNJADIYA</p>
       </div>
     </nav>
   );

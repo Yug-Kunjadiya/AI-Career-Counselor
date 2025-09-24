@@ -282,7 +282,7 @@ html {
   position: relative;
   z-index: 20;
   max-width: 900px;
-  margin: 0 auto;
+  margin: 80px auto 0 auto;
 }
 
 /* Premium Badge */

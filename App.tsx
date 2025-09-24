@@ -194,6 +194,7 @@ My Question: ${messageText}`;
                 onAnalyze={handleAnalyzeResume}
                 isLoading={isLoadingResume}
                 error={errorResume}
+                onBackToDashboard={() => setShowLanding(true)}
               />
               {isLoadingResume && <p className="text-primary mt-2">Analyzing your resume with AI...</p>}
               {parsedResumeData && !isLoadingResume && (
@@ -309,7 +310,7 @@ My Question: ${messageText}`;
         </main>
 
         <footer className="w-full p-6 text-center theme-bg-secondary theme-text-secondary transition-all duration-300">
-          <p>&copy; {new Date().getFullYear()} AI Career Counselor. Powered by Yug Kunjadiya.</p>
+          <p>&copy; {new Date().getFullYear()} AI Career Counselor. Powered by YUG KUNJADIYA.</p>
         </footer>
       </div>
     </div>

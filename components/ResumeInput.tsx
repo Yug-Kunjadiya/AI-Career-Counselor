@@ -1,5 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { AnalyzeIcon, UploadIcon } from './icons'; 
+import React, { useRef, useState } from 'react';
+import { AnalyzeIcon, UploadIcon, ArrowLeftIcon } from './icons'; 
 import LoadingSpinner from './LoadingSpinner';
 import * as pdfjsLib from 'pdfjs-dist';
 import type { PDFDocumentProxy, TextItem } from 'pdfjs-dist/types/src/display/api';
@@ -18,9 +18,10 @@ interface ResumeInputProps {
   onAnalyze: () => void;
   isLoading: boolean;
   error: string | null;
+  onBackToDashboard?: () => void;
 }
 
-const ResumeInput: React.FC<ResumeInputProps> = ({ resumeText, setResumeText, onAnalyze, isLoading, error }) => {
+const ResumeInput: React.FC<ResumeInputProps> = ({ resumeText, setResumeText, onAnalyze, isLoading, error, onBackToDashboard }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
@@ -103,13 +104,27 @@ const ResumeInput: React.FC<ResumeInputProps> = ({ resumeText, setResumeText, on
 
   return (
     <div className="space-y-4">
+      {/* Back to Dashboard Button */}
+      {onBackToDashboard && (
+        <div className="flex justify-start mb-4">
+          <button
+            onClick={onBackToDashboard}
+            className="flex items-center px-4 py-2 text-primary hover:text-primary-dark bg-white hover:bg-primary/5 border border-primary/20 hover:border-primary/40 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 group"
+            aria-label="Back to Dashboard"
+          >
+            <ArrowLeftIcon className="w-4 h-4 mr-2 transition-transform duration-300 group-hover:-translate-x-1" />
+            Back to Dashboard
+          </button>
+        </div>
+      )}
+      
       <p className="text-md text-neutral-dark/80">
         Paste your resume content below, or summarize your skills, experience, and education. 
         Alternatively, upload a plain text (.txt), markdown (.md), or PDF (.pdf) file.
         The AI will analyze it to provide personalized career suggestions.
       </p>
       <textarea
-        className="w-full h-48 p-3 border border-neutral/50 rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 resize-none text-neutral-dark bg-white"
+        className="w-full h-32 p-3 border border-neutral/50 rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 resize-none text-neutral-dark bg-white"
         placeholder="Paste your resume text here, or upload a .txt, .md, or .pdf file..."
         value={resumeText}
         onChange={(e) => setResumeText(e.target.value)}
