@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { ResumeData, CareerSuggestion, ChatMessage } from './types';
+import LandingPage from './components/LandingPage';
 import ResumeInput from './components/ResumeInput';
 import CareerSuggestionsDisplay from './components/CareerSuggestionsDisplay';
 import ProfileBooster from './components/ProfileBooster';
@@ -15,6 +16,7 @@ import { ChatBubbleLeftRightIcon, DocumentTextIcon, LightBulbIcon, WarningTriang
 
 const AppContent: React.FC = () => {
   const { theme } = useTheme();
+  const [showLanding, setShowLanding] = useState<boolean>(true);
   const [apiKeyMissing, setApiKeyMissing] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<string>('resume-analysis');
   const [resumeText, setResumeText] = useState<string>('');
@@ -256,6 +258,11 @@ My Question: ${messageText}`;
         return <div>Page not found</div>;
     }
   };
+
+  // Show landing page first
+  if (showLanding) {
+    return <LandingPage onGetStarted={() => setShowLanding(false)} />;
+  }
 
   return (
     <div className="min-h-screen theme-bg-primary flex transition-all duration-300">
