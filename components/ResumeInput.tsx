@@ -103,28 +103,29 @@ const ResumeInput: React.FC<ResumeInputProps> = ({ resumeText, setResumeText, on
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 max-w-4xl mx-auto">
       {/* Back to Dashboard Button */}
       {onBackToDashboard && (
         <div className="flex justify-start mb-4">
           <button
             onClick={onBackToDashboard}
-            className="flex items-center px-4 py-2 text-primary hover:text-primary-dark bg-white hover:bg-primary/5 border border-primary/20 hover:border-primary/40 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 group"
+            className="flex items-center px-3 sm:px-4 py-2 text-sm sm:text-base text-primary hover:text-primary-dark bg-white hover:bg-primary/5 border border-primary/20 hover:border-primary/40 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 group"
             aria-label="Back to Dashboard"
           >
             <ArrowLeftIcon className="w-4 h-4 mr-2 transition-transform duration-300 group-hover:-translate-x-1" />
-            Back to Dashboard
+            <span className="hidden sm:inline">Back to Dashboard</span>
+            <span className="sm:hidden">Back</span>
           </button>
         </div>
       )}
       
-      <p className="text-md text-neutral-dark/80">
+      <p className="text-sm sm:text-md text-neutral-dark/80 leading-relaxed">
         Paste your resume content below, or summarize your skills, experience, and education. 
         Alternatively, upload a plain text (.txt), markdown (.md), or PDF (.pdf) file.
         The AI will analyze it to provide personalized career suggestions.
       </p>
       <textarea
-        className="w-full h-32 p-3 border border-neutral/50 rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 resize-none text-neutral-dark bg-white"
+        className="w-full h-32 sm:h-40 p-3 sm:p-4 border border-neutral/50 rounded-lg shadow-sm focus:ring-2 focus:ring-primary focus:border-primary transition-colors duration-200 resize-none text-neutral-dark bg-white text-sm sm:text-base"
         placeholder="Paste your resume text here, or upload a .txt, .md, or .pdf file..."
         value={resumeText}
         onChange={(e) => setResumeText(e.target.value)}
@@ -144,41 +145,45 @@ const ResumeInput: React.FC<ResumeInputProps> = ({ resumeText, setResumeText, on
       <button
         onClick={handleUploadClick}
         disabled={isLoading || isReadingFile}
-        className="w-full flex items-center justify-center px-6 py-3 bg-secondary hover:bg-secondary-dark text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary-light focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center px-4 sm:px-6 py-3 bg-secondary hover:bg-secondary-dark text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary-light focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
         aria-label="Upload resume file"
       >
         {isReadingFile ? (
           <>
-            <LoadingSpinner className="w-5 h-5 mr-2" />
-            Reading File...
+            <LoadingSpinner className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+            <span className="hidden sm:inline">Reading File...</span>
+            <span className="sm:hidden">Reading...</span>
           </>
         ) : (
           <>
-            <UploadIcon className="w-5 h-5 mr-2" />
-            Upload Resume File (.txt, .md, .pdf)
+            <UploadIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+            <span className="hidden sm:inline">Upload Resume File (.txt, .md, .pdf)</span>
+            <span className="sm:hidden">Upload File</span>
           </>
         )}
       </button>
 
-      {fileError && <p className="text-sm text-red-600 bg-red-100 p-2 rounded-md" role="alert">{fileError}</p>}
-      {fileName && !fileError && <p className="text-sm text-green-700 bg-green-100 p-2 rounded-md">Loaded: {fileName}</p>}
-      {error && <p className="text-sm text-red-600 bg-red-100 p-2 rounded-md" role="alert">{error}</p>}
+      {fileError && <p className="text-xs sm:text-sm text-red-600 bg-red-100 p-2 sm:p-3 rounded-md" role="alert">{fileError}</p>}
+      {fileName && !fileError && <p className="text-xs sm:text-sm text-green-700 bg-green-100 p-2 sm:p-3 rounded-md">Loaded: {fileName}</p>}
+      {error && <p className="text-xs sm:text-sm text-red-600 bg-red-100 p-2 sm:p-3 rounded-md" role="alert">{error}</p>}
 
       <button
         onClick={onAnalyze}
         disabled={isLoading || isReadingFile || !resumeText.trim()}
-        className="w-full flex items-center justify-center px-6 py-3 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center px-4 sm:px-6 py-3 sm:py-4 bg-primary hover:bg-primary-dark text-white font-semibold rounded-lg shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-primary-light focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
         aria-label="Analyze resume content"
       >
         {isLoading ? (
           <>
-            <LoadingSpinner className="w-5 h-5 mr-2" />
-            Analyzing...
+            <LoadingSpinner className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+            <span className="hidden sm:inline">Analyzing...</span>
+            <span className="sm:hidden">Analyzing...</span>
           </>
         ) : (
           <>
-            <AnalyzeIcon className="w-5 h-5 mr-2" /> 
-            Analyze Resume
+            <AnalyzeIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" /> 
+            <span className="hidden sm:inline">Analyze Resume</span>
+            <span className="sm:hidden">Analyze</span>
           </>
         )}
       </button>

@@ -24,6 +24,7 @@ const AppContent: React.FC = () => {
   const [parsedResumeData, setParsedResumeData] = useState<ResumeData | null>(null);
   const [careerSuggestions, setCareerSuggestions] = useState<CareerSuggestion[]>([]);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   const [isLoadingResume, setIsLoadingResume] = useState<boolean>(false);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState<boolean>(false);
@@ -279,50 +280,92 @@ My Question: ${messageText}`;
 
   return (
     <div className="min-h-screen theme-bg-primary flex transition-all duration-300">
-      <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+      {/* Mobile Menu Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
 
-      <div className="flex-1 flex flex-col">
+      {/* Sidebar - Hidden on mobile, shown as overlay when menu is open */}
+      <div className={`
+        fixed lg:static inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        <Sidebar 
+          currentPage={currentPage} 
+          onNavigate={(page) => {
+            setCurrentPage(page);
+            setIsMobileMenuOpen(false); // Close mobile menu when navigating
+          }} 
+        />
+      </div>
+
+      <div className="flex-1 flex flex-col lg:ml-0">
         <header 
-          className="fixed top-0 left-64 right-0 z-30 theme-bg-surface theme-shadow-lg transition-all duration-300"
+          className="fixed top-0 left-0 lg:left-64 right-0 z-30 theme-bg-surface theme-shadow-lg transition-all duration-300"
           style={{
             backdropFilter: scrollY > 50 ? 'blur(20px)' : 'blur(10px)',
             borderBottom: `1px solid ${theme.colors.border}`,
             backgroundColor: scrollY > 50 ? theme.colors.surface + 'E6' : theme.colors.surface,
           }}
         >
-          <div className="flex flex-col items-center relative">
-            <div className="absolute top-0 right-0">
-              <ThemeToggle />
+          <div className="flex items-center justify-between p-4 lg:justify-center lg:flex-col">
+            {/* Mobile Menu Button */}
+            <button
+              className="lg:hidden p-2 rounded-md theme-text-primary hover:theme-bg-hover transition-colors"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            {/* Header Content */}
+            <div className="flex-1 lg:flex-none text-center lg:relative">
+              <div className="absolute top-0 right-0 lg:static lg:absolute lg:top-0 lg:right-0">
+                <ThemeToggle />
+              </div>
+              <h1 className="text-xl sm:text-2xl lg:text-4xl xl:text-5xl font-extrabold theme-text-primary drop-shadow-lg leading-tight">
+                AI Career Counselor
+              </h1>
+              <p className="text-sm sm:text-base lg:text-lg theme-text-secondary mt-1 lg:mt-3 max-w-xl hidden sm:block">
+                Your intelligent guide to a brighter professional future.
+              </p>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold theme-text-primary drop-shadow-lg leading-tight">
-              AI Career Counselor
-            </h1>
-            <p className="text-base md:text-lg theme-text-secondary mt-3 max-w-xl">
-              Your intelligent guide to a brighter professional future.
-            </p>
+
+            {/* Spacer for mobile */}
+            <div className="w-10 lg:hidden"></div>
           </div>
         </header>
 
         {apiKeyMissing && (
-          <div className="mx-6 mt-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-lg" role="alert">
+          <div className="mx-4 lg:mx-6 mt-6 bg-red-100 border-l-4 border-red-500 text-red-700 p-3 lg:p-4 rounded-md shadow-lg" role="alert">
             <div className="flex">
-              <div className="py-1"><WarningTriangleIcon className="h-6 w-6 text-red-500 mr-3" /></div>
+              <div className="py-1"><WarningTriangleIcon className="h-5 w-5 lg:h-6 lg:w-6 text-red-500 mr-2 lg:mr-3 flex-shrink-0" /></div>
               <div>
-                <p className="font-bold">API Key Missing</p>
-                <p className="text-sm">The Gemini API Key (<code>API_KEY</code>) is not configured. AI-powered features will not be available. Please ensure it is set in your environment.</p>
+                <p className="font-bold text-sm lg:text-base">API Key Missing</p>
+                <p className="text-xs lg:text-sm">The Gemini API Key (<code>API_KEY</code>) is not configured. AI-powered features will not be available. Please ensure it is set in your environment.</p>
               </div>
             </div>
           </div>
         )}
 
-        <main className="flex-1 p-6 pt-40">
+        <main 
+          className="flex-1 p-4 lg:p-6 pt-32 lg:pt-40"
+          style={{
+            color: theme.colors.textPrimary, // Dynamic text color for light/dark mode
+          }}
+        >
           <div className="transition-all duration-500 ease-in-out transform animate-fade-in">
             {renderCurrentPage()}
           </div>
         </main>
 
-        <footer className="w-full p-6 text-center theme-bg-secondary theme-text-secondary transition-all duration-300">
-          <p>&copy; {new Date().getFullYear()} AI Career Counselor. Powered by YUG KUNJADIYA.</p>
+        <footer className="w-full p-4 lg:p-6 text-center theme-bg-secondary theme-text-secondary transition-all duration-300">
+          <p className="text-sm lg:text-base">&copy; {new Date().getFullYear()} AI Career Counselor. Powered by YUG KUNJADIYA.</p>
         </footer>
       </div>
     </div>

@@ -55,21 +55,21 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({ resumeData }) => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-4 lg:p-6 space-y-4 lg:space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold theme-text-primary mb-2">Career Roadmap</h1>
-        <p className="theme-text-secondary">Get a personalized roadmap to achieve your career goals</p>
+        <h1 className="text-2xl lg:text-3xl font-bold theme-text-primary mb-2">Career Roadmap</h1>
+        <p className="text-sm lg:text-base theme-text-secondary">Get a personalized roadmap to achieve your career goals</p>
       </div>
 
       {!resumeData && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800">Please upload and analyze your resume first to generate a personalized roadmap.</p>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 lg:p-4">
+          <p className="text-sm lg:text-base text-yellow-800">Please upload and analyze your resume first to generate a personalized roadmap.</p>
         </div>
       )}
 
       {resumeData && (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-4 lg:p-6">
+          <div className="flex flex-col gap-4 mb-6">
             <div className="flex-grow">
               <label htmlFor="targetCareer" className="block text-sm font-medium text-gray-700 mb-2">
                 Target Career Path
@@ -80,14 +80,14 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({ resumeData }) => {
                 value={targetCareer}
                 onChange={(e) => setTargetCareer(e.target.value)}
                 placeholder="e.g., Software Engineer, Data Scientist, Product Manager"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                className="w-full p-3 text-sm lg:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
               />
             </div>
-            <div className="flex items-end">
+            <div className="w-full">
               <button
                 onClick={handleGenerateRoadmap}
                 disabled={isLoading || !targetCareer.trim()}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                className="w-full lg:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 text-sm lg:text-base"
               >
                 {isLoading ? 'Generating...' : 'Generate Roadmap'}
               </button>
@@ -122,35 +122,41 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({ resumeData }) => {
               {/* 6-Month Roadmap */}
               <div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">6-Month Roadmap</h3>
-                <div className="space-y-4">
+                <div className="space-y-3 lg:space-y-4">
                   {roadmap.sixMonthRoadmap.map((milestone, index) => (
-                    <div key={milestone.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                    <div key={milestone.id} className="bg-white border border-gray-200 rounded-lg p-3 lg:p-4 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-grow">
-                          <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-start gap-3 mb-2">
                             <input
                               type="checkbox"
                               checked={milestone.completed}
                               onChange={() => toggleMilestone(milestone.id, true)}
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              className="w-4 h-4 mt-1 text-blue-600 rounded focus:ring-blue-500 flex-shrink-0"
                             />
-                            <h4 className="text-lg font-medium text-gray-800">{milestone.title}</h4>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(milestone.priority)}`}>
-                              {milestone.priority}
-                            </span>
-                          </div>
-                          <p className="text-gray-600 mb-3">{milestone.description}</p>
-                          <div className="flex flex-wrap gap-4 text-sm">
-                            <div>
-                              <span className="font-medium text-gray-700">Duration:</span> {milestone.duration}
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-700">Skills:</span>{' '}
-                              {milestone.skills.map((skill, i) => (
-                                <span key={i} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-1">
-                                  {skill}
+                            <div className="flex-grow">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                                <h4 className="text-base lg:text-lg font-medium text-gray-800">{milestone.title}</h4>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium self-start ${getPriorityColor(milestone.priority)}`}>
+                                  {milestone.priority}
                                 </span>
-                              ))}
+                              </div>
+                              <p className="text-sm lg:text-base text-gray-600 mb-3">{milestone.description}</p>
+                              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-sm">
+                                <div>
+                                  <span className="font-medium text-gray-700">Duration:</span> {milestone.duration}
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-700">Skills:</span>{' '}
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {milestone.skills.map((skill, i) => (
+                                      <span key={i} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                                        {skill}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                           <div className="mt-3">
@@ -171,35 +177,41 @@ const CareerRoadmap: React.FC<CareerRoadmapProps> = ({ resumeData }) => {
               {/* 1-Year Roadmap */}
               <div>
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">1-Year Roadmap</h3>
-                <div className="space-y-4">
-                  {roadmap.oneYearRoadmap.map((milestone, index) => (
-                    <div key={milestone.id} className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+                <div className="space-y-3 lg:space-y-4">
+                  {roadmap.oneYearRoadmap.map((milestone) => (
+                    <div key={milestone.id} className="bg-white border border-gray-200 rounded-lg p-3 lg:p-4 shadow-sm">
                       <div className="flex items-start justify-between">
                         <div className="flex-grow">
-                          <div className="flex items-center gap-3 mb-2">
+                          <div className="flex items-start gap-3 mb-2">
                             <input
                               type="checkbox"
                               checked={milestone.completed}
                               onChange={() => toggleMilestone(milestone.id, false)}
-                              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                              className="w-4 h-4 mt-1 text-blue-600 rounded focus:ring-blue-500 flex-shrink-0"
                             />
-                            <h4 className="text-lg font-medium text-gray-800">{milestone.title}</h4>
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(milestone.priority)}`}>
-                              {milestone.priority}
-                            </span>
-                          </div>
-                          <p className="text-gray-600 mb-3">{milestone.description}</p>
-                          <div className="flex flex-wrap gap-4 text-sm">
-                            <div>
-                              <span className="font-medium text-gray-700">Duration:</span> {milestone.duration}
-                            </div>
-                            <div>
-                              <span className="font-medium text-gray-700">Skills:</span>{' '}
-                              {milestone.skills.map((skill, i) => (
-                                <span key={i} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs mr-1">
-                                  {skill}
+                            <div className="flex-grow">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+                                <h4 className="text-base lg:text-lg font-medium text-gray-800">{milestone.title}</h4>
+                                <span className={`px-2 py-1 rounded-full text-xs font-medium self-start ${getPriorityColor(milestone.priority)}`}>
+                                  {milestone.priority}
                                 </span>
-                              ))}
+                              </div>
+                              <p className="text-sm lg:text-base text-gray-600 mb-3">{milestone.description}</p>
+                              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-sm">
+                                <div>
+                                  <span className="font-medium text-gray-700">Duration:</span> {milestone.duration}
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-700">Skills:</span>{' '}
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {milestone.skills.map((skill, i) => (
+                                      <span key={i} className="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                                        {skill}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           </div>
                           <div className="mt-3">
